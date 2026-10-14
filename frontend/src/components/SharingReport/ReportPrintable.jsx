@@ -96,25 +96,25 @@ const RevenueRow = ({ label, icon, data, isLast }) => {
 
 
 const ReportPrintable = forwardRef(
-    ({ report }, ref) => {
+    ({ report = {} }, ref) => {
 
-        const { period, consultant, summary, opd, ipd, combined_demographics, combined_patient_types } = report;
+        const { period, consultant, summary, opd, ipd, combined_demographics, combined_patient_types } = report || {};
 
         const genderTotal =
-            combined_demographics.gender.male + combined_demographics.gender.female;
+            combined_demographics?.gender?.male + combined_demographics?.gender?.female;
 
         const ageTotal =
-            combined_demographics.age_groups.infant +
-            combined_demographics.age_groups.child +
-            combined_demographics.age_groups.teen +
-            combined_demographics.age_groups.adult +
-            combined_demographics.age_groups.senior;
+            combined_demographics?.age_groups.infant +
+            combined_demographics?.age_groups.child +
+            combined_demographics?.age_groups.teen +
+            combined_demographics?.age_groups.adult +
+            combined_demographics?.age_groups.senior;
 
         const patientTypeTotal =
-            combined_patient_types.public +
-            combined_patient_types.zakat +
-            combined_patient_types.bmj +
-            combined_patient_types.spd;
+            combined_patient_types?.public +
+            combined_patient_types?.zakat +
+            combined_patient_types?.bmj +
+            combined_patient_types?.spd;
 
         return (
             <div ref={ref} className="bg-white rounded-2xl shadow-md overflow-hidden max-w-5xl mx-auto">
@@ -125,12 +125,12 @@ const ReportPrintable = forwardRef(
                         <p className="text-[11px] uppercase tracking-widest opacity-70 mb-1">
                             Consultant Sharing Report
                         </p>
-                        <h1 className="text-2xl font-bold leading-tight">{consultant.name}</h1>
+                        <h1 className="text-2xl font-bold leading-tight">{consultant?.name}</h1>
                         <p className="text-sm opacity-90 mt-0.5">
-                            {consultant.degrees}{consultant.degrees && consultant.faculty ? " • " : ""}{consultant.faculty}
+                            {consultant?.degrees}{consultant?.degrees && consultant?.faculty ? " • " : ""}{consultant?.faculty}
                         </p>
                         <p className="text-xs opacity-75 mt-2 bg-white/10 inline-block px-2.5 py-1 rounded-full">
-                            {moment(period.fromDate).format("DD MMM YYYY")} — {moment(period.toDate).format("DD MMM YYYY")}
+                            {moment(period?.fromDate).format("DD MMM YYYY")} — {moment(period?.toDate).format("DD MMM YYYY")}
                         </p>
                     </div>
 
@@ -147,10 +147,10 @@ const ReportPrintable = forwardRef(
                     <section>
                         <SectionHeader title="Overview" subtitle="Is period ki patient aur revenue summary" />
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <StatCard icon={<TeamOutlined />} label="Total Patients" value={summary.total_patients} tone="blue" />
-                            <StatCard icon={<DollarCircleOutlined />} label="Gross Amount" value={summary.total_gross} isCurrency tone="slate" />
-                            <StatCard icon={<PercentageOutlined />} label="WHT (15%)" value={summary.total_tax} isCurrency tone="orange" />
-                            <StatCard icon={<DollarCircleOutlined />} label="Doctor Earning " value={summary.total_consultant_share} isCurrency tone="green" />
+                            <StatCard icon={<TeamOutlined />} label="Total Patients" value={summary?.total_patients} tone="blue" />
+                            <StatCard icon={<DollarCircleOutlined />} label="Gross Amount" value={summary?.total_gross} isCurrency tone="slate" />
+                            <StatCard icon={<PercentageOutlined />} label="WHT (15%)" value={summary?.total_tax} isCurrency tone="orange" />
+                            <StatCard icon={<DollarCircleOutlined />} label="Doctor Earning " value={summary?.total_consultant_share} isCurrency tone="green" />
                         </div>
 
                         {/* Queue status sirf OPD me hota he, IPD me nahi — isliye label clear kiya */}
@@ -171,17 +171,17 @@ const ReportPrintable = forwardRef(
                                 <p className="text-xs font-semibold text-slate-500 mb-3 flex items-center gap-2">
                                     <FaMale className="text-[#1677ff]" /> / <FaFemale className="text-pink-500" /> Gender Split
                                 </p>
-                                <BarRow label="Male" value={combined_demographics.gender.male} total={genderTotal} color="#1677ff" />
-                                <BarRow label="Female" value={combined_demographics.gender.female} total={genderTotal} color="#f759ab" />
+                                <BarRow label="Male" value={combined_demographics?.gender.male} total={genderTotal} color="#1677ff" />
+                                <BarRow label="Female" value={combined_demographics?.gender.female} total={genderTotal} color="#f759ab" />
                             </div>
 
                             <div>
                                 <p className="text-xs font-semibold text-slate-500 mb-3">Age Groups</p>
-                                <BarRow label="Infant" value={combined_demographics.age_groups.infant} total={ageTotal} color="#36cfc9" />
-                                <BarRow label="Child" value={combined_demographics.age_groups.child} total={ageTotal} color="#40a9ff" />
-                                <BarRow label="Teen" value={combined_demographics.age_groups.teen} total={ageTotal} color="#597ef7" />
-                                <BarRow label="Adult" value={combined_demographics.age_groups.adult} total={ageTotal} color="#9254de" />
-                                <BarRow label="Senior" value={combined_demographics.age_groups.senior} total={ageTotal} color="#ff7a45" />
+                                <BarRow label="Infant" value={combined_demographics?.age_groups.infant} total={ageTotal} color="#36cfc9" />
+                                <BarRow label="Child" value={combined_demographics?.age_groups.child} total={ageTotal} color="#40a9ff" />
+                                <BarRow label="Teen" value={combined_demographics?.age_groups.teen} total={ageTotal} color="#597ef7" />
+                                <BarRow label="Adult" value={combined_demographics?.age_groups.adult} total={ageTotal} color="#9254de" />
+                                <BarRow label="Senior" value={combined_demographics?.age_groups.senior} total={ageTotal} color="#ff7a45" />
                             </div>
                         </div>
 
@@ -191,10 +191,10 @@ const ReportPrintable = forwardRef(
                                 <UsergroupAddOutlined /> Patient Type
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                                <BarRow label="Public" value={combined_patient_types.public} total={patientTypeTotal} color="#1677ff" />
-                                <BarRow label="Zakat" value={combined_patient_types.zakat} total={patientTypeTotal} color="#36cfc9" />
-                                <BarRow label="BMJ" value={combined_patient_types.bmj} total={patientTypeTotal} color="#9254de" />
-                                <BarRow label="SPD" value={combined_patient_types.spd} total={patientTypeTotal} color="#ff7a45" />
+                                <BarRow label="Public" value={combined_patient_types?.public} total={patientTypeTotal} color="#1677ff" />
+                                <BarRow label="Zakat" value={combined_patient_types?.zakat} total={patientTypeTotal} color="#36cfc9" />
+                                <BarRow label="BMJ" value={combined_patient_types?.bmj} total={patientTypeTotal} color="#9254de" />
+                                <BarRow label="SPD" value={combined_patient_types?.spd} total={patientTypeTotal} color="#ff7a45" />
                             </div>
                         </div>
                     </section>
@@ -229,7 +229,7 @@ const ReportPrintable = forwardRef(
                             <div className="mt-4 rounded-xl bg-gradient-to-r from-[#1677ff] to-[#0d47c9] text-white p-5 flex items-center justify-between">
                                 <div>
                                     <p className="text-xs uppercase tracking-wide opacity-75">Total Consultant Earning</p>
-                                    <p className="text-2xl font-bold mt-1">{money(summary.total_consultant_share)}</p>
+                                    <p className="text-2xl font-bold mt-1">{money(summary?.total_consultant_share)}</p>
                                 </div>
                                 <span className="text-4xl opacity-30">Rs</span>
                             </div>

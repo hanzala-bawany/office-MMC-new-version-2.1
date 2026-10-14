@@ -83,7 +83,7 @@ const LoginPage = () => {
         navigate("/receptionist");
 
       }
-      else if (decoded?.role == "screen" && decoded?.id >= 6 && decoded?.id <= 10) {
+      else if (decoded?.role == "screen" && decoded?.id >= 6 && decoded?.id <= 10) {        //  decoded?.id = 6 means screen 5
 
         const screenAccessMap = {
           "005Screen5": { path: "/screen", id: 6, num: 5 },

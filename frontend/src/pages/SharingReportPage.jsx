@@ -154,22 +154,26 @@ const SharingReportPage = () => {
         deepPdfLoading={deepPdfLoading}
       />
 
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <Spin size="large" />
-        </div>
-      ) : !report && !deepReport ? (
-        <div className="bg-white rounded-xl shadow p-10">
-          <Empty description="Report dekhne ke lie filters set kar ke 'Generate Report' dabayen" />
-        </div>
-      ) : (
+      {
+      // loading ? (
+      //   <div className="flex justify-center items-center py-20">
+      //     <Spin size="large" />
+      //   </div>
+      // ) :
+      //  !report && !deepReport ? (
+      //   <div className="bg-white rounded-xl shadow p-10">
+      //     <Empty description="Report dekhne ke lie filters set kar ke 'Generate Report' dabayen" />
+      //   </div>
+      // ) : 
+      (
         <>
-          {report && <ReportPrintable ref={printableRef} report={report} />}
+          {<ReportPrintable ref={printableRef} report={report} />}
           {/* {isAdmin & deepReport && (
             <DeepReportTable opdData={deepReport?.opdData} ipdData={deepReport?.ipdData} />
           )} */}
         </>
-      )}
+      )
+      }
     </div>
   );
 };

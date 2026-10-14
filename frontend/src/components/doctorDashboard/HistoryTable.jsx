@@ -35,7 +35,7 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
   const [activeReportTab, setActiveReportTab] = useState("cbc");
 
 
-  // console.log(currentPatientHistory, "currentPatientHistory ,,,,,,,,,,,");
+  console.log(currentPatientHistory, "currentPatientHistory ,,,,,,,,,,,");
   // console.log(selectedHistory, "selectedHistory ,,,,,,,,,,,");
   // console.log(lastVisit, "lastVisit ,,,,,,,,,,,");
 
@@ -89,94 +89,94 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
         </>
       ),
     },
-    {
-      title: "Report",
-      render: (_, rowData) => (
-        <>
-          {console.log(rowData, "rowData of reports , ,,,,,,,,,,,,,,,,,,")}
-          <Button
-            icon={<FaMicroscope />}
-            className="flex items-center gap-2 border-blue-500 text-blue-500 "
-            onClick={() => openReportModal(rowData)}
-          >
-            View
-          </Button>
-        </>
-      ),
-    },
+    // {
+    //   title: "Report",
+    //   render: (_, rowData) => (
+    //     <>
+    //       {/* {console.log(rowData, "rowData of reports , ,,,,,,,,,,,,,,,,,,")} */}
+    //       <Button
+    //         icon={<FaMicroscope />}
+    //         className="flex items-center gap-2 border-blue-500 text-blue-500 "
+    //         onClick={() => openReportModal(rowData)}
+    //       >
+    //         View
+    //       </Button>
+    //     </>
+    //   ),
+    // },
   ];
 
-  // console.log(selectedHistory?.MEDICAL_TESTS, "selectedHistory?.MEDICAL_TESTS");
+  // console.log(selectedHistory, "selectedHistory?.MEDICAL_TESTS");
 
-  const isCBC = selectedHistory?.MEDICAL_TESTS?.toLowerCase().includes("cbc") 
-  const isUrine = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("urine");
-  const iskidneyFunction = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidneyfunction") || selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidney function");
+  // const isCBC = selectedHistory?.MEDICAL_TESTS?.toLowerCase().includes("cbc") 
+  // const isUrine = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("urine");
+  // const iskidneyFunction = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidneyfunction") || selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidney function");
 
-  const getReportTabs = () => {
+  // const getReportTabs = () => {
 
-    const tabs = [];
+  //   const tabs = [];
 
-    if (isCBC) {
-      tabs.push({
-        key: "cbc",
-        label: (
-          <span className="flex items-center gap-2">
-            <FaFlask className="text-blue-500" />
-            CBC Report
-          </span>
-        ),
-        children: <CBCReport patientData={selectedHistory} />,
-      });
-    }
+  //   if (isCBC) {
+  //     tabs.push({
+  //       key: "cbc",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaFlask className="text-blue-500" />
+  //           CBC Report
+  //         </span>
+  //       ),
+  //       children: <CBCReport patientData={selectedHistory} />,
+  //     });
+  //   }
 
-    if (isUrine) {
-      tabs.push({
-        key: "urine",
-        label: (
-          <span className="flex items-center gap-2">
-            <FaNotesMedical className="text-green-500" />
-            Urine Report
-          </span>
-        ),
-        children: <UrineReport patientData={selectedHistory} />,
-      });
-    }
+  //   if (isUrine) {
+  //     tabs.push({
+  //       key: "urine",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaNotesMedical className="text-green-500" />
+  //           Urine Report
+  //         </span>
+  //       ),
+  //       children: <UrineReport patientData={selectedHistory} />,
+  //     });
+  //   }
 
-    if (iskidneyFunction) {
-      tabs.push({
-        key: "kidneyFunction",
-        label: (
-          <span className="flex items-center gap-2">
-            <FaNotesMedical className="text-green-500" />
-            kidney Function Report
-          </span>
-        ),
-        children: <KidneyFunction patientData={selectedHistory} />,
-      });
-    }
+  //   if (iskidneyFunction) {
+  //     tabs.push({
+  //       key: "kidneyFunction",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaNotesMedical className="text-green-500" />
+  //           kidney Function Report
+  //         </span>
+  //       ),
+  //       children: <KidneyFunction patientData={selectedHistory} />,
+  //     });
+  //   }
 
-    // If no specific tests found, show a message
-    if (tabs.length === 0) {
-      tabs.push({
-        key: "no-report",
-        label: (
-          <span className="flex items-center gap-2">
-            <FaMicroscope className="text-gray-500" />
-            No Reports
-          </span>
-        ),
-        children: (
-          <div className="p-8 text-center">
-            <FaMicroscope className="text-4xl text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No lab reports available for this visit</p>
-            <p className="text-gray-400 text-sm mt-1">Medical tests: {selectedHistory?.MEDICAL_TESTS || 'Not specified'}</p>
-          </div>
-        ),
-      });
-    }
+  //   // If no specific tests found, show a message
+  //   if (tabs.length === 0) {
+  //     tabs.push({
+  //       key: "no-report",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaMicroscope className="text-gray-500" />
+  //           No Reports
+  //         </span>
+  //       ),
+  //       children: (
+  //         <div className="p-8 text-center">
+  //           <FaMicroscope className="text-4xl text-gray-300 mx-auto mb-3" />
+  //           <p className="text-gray-500 font-medium">No lab reports available for this visit</p>
+  //           <p className="text-gray-400 text-sm mt-1">Medical tests: {selectedHistory?.MEDICAL_TESTS || 'Not specified'}</p>
+  //         </div>
+  //       ),
+  //     });
+  //   }
 
-    return tabs;
-  };
+  //   return tabs;
+  // };
 
 
   return (
@@ -372,7 +372,7 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
 
       {/* =====================  Report Component ===================== */}
 
-      <Modal
+      {/* <Modal
         open={openReport}
         onCancel={() => setOpenReport(false)}
         footer={null}
@@ -414,7 +414,7 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
 
         />
 
-      </Modal>
+      </Modal> */}
 
       {/* ===================== History ===================== */}
 
