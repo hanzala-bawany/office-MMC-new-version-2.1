@@ -2,7 +2,7 @@ const { logger } = require("./errorLogsMaker.js");
 
 const handleError = (res, err, message = "Internal server error", status = 500) => {
 
-  console.error(message, err);
+  console.log(message, err);
 
   logger.error(message, {
     message: err.message,

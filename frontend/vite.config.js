@@ -9,8 +9,10 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [
-      "included-trek-vids-karma.trycloudflare.com",  // frontend url 
-    
-    ]
+      '.ngrok-free.app',
+      '.ngrok-free.dev',
+      '.ngrok.app',
+      '.trycloudflare.com',
+    ],
   }
 })

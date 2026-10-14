@@ -12,6 +12,7 @@ import "driver.js/dist/driver.css";
 import Footer from "../components/doctorDashboard/Footer.jsx";
 import { logoutUser } from "../reduxToolKit/authSlice.js";
 import { useNavigate } from "react-router-dom";
+import LabReportsSection from "../components/doctorDashboard/LabReportsSection.jsx";
 
 
 const DoctorDashboard = () => {
@@ -339,6 +340,8 @@ const DoctorDashboard = () => {
 
       {/* History */}
       <HistoryTable currentPatientHistory={currentPatientHistory} lastVisit={lastVisit} />
+
+      <LabReportsSection mrNo={patientsData?.patients?.[0]?.MRNO} />
 
       {/* <Footer /> */}
 

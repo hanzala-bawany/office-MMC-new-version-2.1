@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     Button,
     Input,
@@ -36,6 +36,9 @@ import { useSelector } from 'react-redux';
 import OpdReceiptModal from './opdReceiptModal';
 import './OPDReceipt.css';
 import { toast } from 'react-toastify';
+import OPDCardReceipt from '../OutPatient/OPDCardReceipt';
+import { useReactToPrint } from 'react-to-print';
+import OPDServiceReceipt from '../OutPatient/OPDServiceReceipt';
 
 
 
@@ -66,6 +69,10 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
     const [searchValue, setSearchValue] = useState('');
     const [searchPatientsData, setSearchPatientsData] = useState(null);
     const [searchPatientsLoading, setSearchPatientsLoading] = useState(false);
+    const [printData, setPrintData] = useState(null);
+    const [printLoading, setPrintLoading] = useState(false);
+    const [shouldPrint, setShouldPrint] = useState(false);
+    const printRef = useRef();
     const discountAmount = Form.useWatch('discountAmount', form);
     const partialAmount = Form.useWatch('partialPayment', form);
 
@@ -74,19 +81,14 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
     const { data: membersData, loading: membersLoading, error: membersError } = useFetch('/api/receptionist/members');
     const { data: labTestData, loading: labTestLoading, error: labTestError } = useFetch('/api/receptionist/getLabTest');
     const { data: usersData, loading: usersLoading, error: usersError } = useFetch('/api/receptionist/users');
-
     const { data: memberDependentData, loading: memberDependentLoading, error: memberDependentError } =
         useFetch(selectedMemberNo ? `/api/receptionist/members/${selectedMemberNo}` : null);
-
     const { data: last10PatientsData, loading: last10PatientsLoading, error: last10PatientsError, reFetchData: refetchLast10Patients } =
         useFetch(loginUserData?.username ? `/api/receptionist/lastPatient/${loginUserData?.username}` : null);
-
     const { data: currentCashData, loading: currentCashDataLoading, error: currentCashDataError, reFetchData: refetchcurrentCashData } =
         useFetch(loginUserData?.username ? `/api/receptionist/getCurrentCash/${loginUserData?.username}` : null);
-
     const { data: referenceData, loading: referenceLoading, error: referenceError } =
         useFetch(`/api/receptionist/reference`);
-
     const { data: consultantsData, loading: consultantsLoading, error: consultantsError } =
         useFetch('/api/receptionist/allConsultant', { facultyId: opdCategoryId || null });
 
@@ -142,6 +144,7 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
     // console.log(selectedLabTestAmounts, "selectedLabTestAmounts  ..............");
     // console.log(loginUserData, "loginUserData  ..............");
     // console.log(currentCashData, "currentCashData  ..............");
+    // console.log(receiptNumToPrintRef.current, "receiptNumToPrintRef  ..............");
 
 
     useEffect(() => {
@@ -179,6 +182,14 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
         handleEditPatient(editRecord)
 
     }, [editRecord]);
+
+    useEffect(() => {
+        if (shouldPrint && printData) {
+            // React ne data render kar diya
+            handlePrint()
+            setShouldPrint(false);
+        }
+    }, [printData, shouldPrint]);
 
 
     const handleFieldChange = (changedValues, allValues) => {
@@ -245,6 +256,12 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
                 clearEditRecord?.();
             }
 
+            if (!editRecord) {
+                const receiptNum = res?.data?.data?.receiptNo;
+                getReceiptDataForPrint(receiptNum)
+            }
+
+
         } catch (err) {
             console.error('Error saving OPD receipt:', err);
             toast.error(err?.response?.data?.message || "Failed to generate OPD reciept");
@@ -310,6 +327,7 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
         if (editRecord) {
             clearEditRecord?.();
         }
+        setPrintData(null)
     };
 
     const labTestHandler = (value, option) => {
@@ -402,6 +420,7 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
 
         if (!editRecord) return;
 
+        setPrintData(null)
         setPatientTypeId(editRecord.PATIENTTYPE);
         setOpdCategoryId(editRecord.CATAGORYID);
         setIslabortaryAble(editRecord.CATAGORYID == 2);
@@ -469,6 +488,42 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
                 : undefined,
         });
     }
+
+    const getReceiptDataForPrint = async (receiptNum) => {
+
+        if (!receiptNum) {
+            return toast.warning("Receipt Num is missing");
+        }
+        setPrintLoading(true);
+        try {
+            const res = await axiosInstance.get(`/api/outPatient/opdReceipt/getOpdReceiptnTestPrint/${receiptNum}`);
+            console.log(res, "res of get Opd ReceiptnTest Print");
+            setPrintData(res?.data?.data);
+            setShouldPrint(true);
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Failed to fetch  Opd ReceiptnTest Print");
+            throw error;
+        } finally {
+            setPrintLoading(false);
+        }
+    }
+
+    const handlePrint = useReactToPrint({
+        contentRef: printRef,
+        documentTitle: `OPD_${"Receipt"}`
+    });
+
+    const printBtnHandler = () => {
+        const receiptNo = editRecord?.RECEIPTNO;
+        if (receiptNo) {
+            getReceiptDataForPrint(receiptNo)
+        } else {
+            toast.warning("No receipt number found to print");
+        }
+    }
+
+
+    // console.log(printData , "printData ..............");
 
 
     return (
@@ -1233,6 +1288,9 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
                                     type="default"
                                     icon={<PrinterOutlined />}
                                     className="hover:border-blue-400 hover:text-blue-600"
+                                    disabled={!editRecord || loginUserData?.role != "Admin"}
+                                    onClick={printBtnHandler}
+                                    loading={printLoading}
                                 >
                                     Print
                                 </Button>
@@ -1252,8 +1310,8 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
                                 <Button
                                     type="primary"
                                     icon={<SaveOutlined />}
-                                    loading={addEditPatientLoading}
-                                    disabled={editRecord && loginUserData?.username != "Admin"}
+                                    loading={addEditPatientLoading || (!editRecord && printLoading)}
+                                    disabled={editRecord && loginUserData?.role != "Admin"}
                                     htmlType="submit"
                                     className="bg-linear-to-r from-emerald-500 to-green-600 border-0 shadow-md shadow-green-500/30 hover:shadow-lg hover:shadow-green-500/40"
                                 >
@@ -1274,6 +1332,25 @@ const OPDReceipt = ({ editRecord, clearEditRecord, handleEdit }) => {
                 </Form>
 
             </Card>
+
+            {/* ✅ Hidden print component - Data passed via props */}
+            <div style={{ display: 'none' }}>
+                {
+                    printData && (
+                        printData?.receiptData[0]?.CATAGORYTITLE == "General O.P.D" ? (
+                            <OPDCardReceipt
+                                ref={printRef}
+                                receipt={printData}
+                            />
+                        ) : (
+                            <OPDServiceReceipt
+                                ref={printRef}
+                                receipt={printData}
+                            />
+                        )
+                    )
+                }
+            </div>
 
 
         </div >
