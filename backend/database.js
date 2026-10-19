@@ -1,8 +1,11 @@
+const path = require("path");
 const oracledb = require("oracledb");
-require("dotenv").config();
+const { baseDir } = require("./paths.js");
+
+require("dotenv").config({ path: path.join(baseDir, ".env"), quiet: true });
 
 oracledb.initOracleClient({
-  libDir: "./Oracle/instantclient_21_20",
+  libDir: path.join(baseDir, "Oracle", "instantclient_21_20"),
 });
 
 async function initPool() {

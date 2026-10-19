@@ -14,7 +14,7 @@ const ReportsLayout = ({ children, reportData, Title: reportTitle, type }) => {
   const currentDate = moment().format("DD-MMMM-YYYY");
   //   const currentDate = type == "labReport" && reportData?.LAB_DATE ? reportData.LAB_DATE : moment().format("DD-MMMM-YYYY");
 
-  console.log(reportData, "reportData ...............");
+  // console.log(reportData, "reportData ...............");
 
   return (
     <Card
@@ -156,7 +156,8 @@ const ReportsLayout = ({ children, reportData, Title: reportTitle, type }) => {
       ) : type == "labReport" ? (
         <div className="bg-gray-50 p-3 sm:p-4 border-b border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5">
-            {[
+            {
+            [
               ["Patient Name :", reportData?.PATIENT_NAME],
               ["Lab Receipt No :", reportData?.LAB_RECEIPTNO],
               ["Ordered By :", reportData?.ORDERED_BY_NAME],
@@ -172,11 +173,12 @@ const ReportsLayout = ({ children, reportData, Title: reportTitle, type }) => {
                   {value || "N/A"}
                 </Text>
               </div>
-            ))}
+            ))
+            }
           </div>
         </div>
       ) : (
-        <div>other</div>
+        null
       )}
 
       {/* ============ BODY ============ */}

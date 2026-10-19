@@ -2,6 +2,8 @@ const express = require("express");
 require("./database.js");
 const cors = require("cors");
 const path = require("path");
+const { baseDir } = require("./paths.js");
+require("dotenv").config({ path: path.join(baseDir, ".env"), quiet: true });
 const http = require("http");
 const { Server } = require("socket.io");
 // Routes
@@ -55,7 +57,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-app.use("/assets", express.static(path.join(process.cwd(), "assets")));
+app.use("/assets", express.static(path.join(baseDir, "assets")));
 app.use("/api/auth", authRoutes);
 app.use("/api/faculty", facultyRoutes);
 app.use("/api/screen2images", screen2ImagesRoutes);

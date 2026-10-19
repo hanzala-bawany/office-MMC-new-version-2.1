@@ -72,7 +72,7 @@ const LabReportsSection = ({ mrNo }) => {
 
   const shown = filtered.slice(0, visible);
 
-  console.log(receipts , "receipts ........");
+  // console.log(receipts , "receipts ........");
   
 
   return (
