@@ -1,0 +1,20 @@
+/* Tags ko vertically stack karo */
+.vertical-tags-select .ant-select-selector {
+    height: 90px;       /* roughly 3 tags ki height, apni tag height ke hisaab se adjust karo */
+    overflow-y: auto;
+    display: flex;
+}
+
+.vertical-tags-select .ant-select-selection-overflow {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.vertical-tags-select .ant-select-selection-overflow-item {
+    width: 100%;
+}
+
+.vertical-tags-select .ant-select-selection-item {
+    width: 100%;
+    margin: 2px 0;   /* horizontal gap ki jagah vertical gap */
+}

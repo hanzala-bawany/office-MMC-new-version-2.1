@@ -12,6 +12,7 @@ import "driver.js/dist/driver.css";
 import Footer from "../components/doctorDashboard/Footer.jsx";
 import { logoutUser } from "../reduxToolKit/authSlice.js";
 import { useNavigate } from "react-router-dom";
+import LabReportsSection from "../components/doctorDashboard/LabReportsSection.jsx";
 
 
 const DoctorDashboard = () => {
@@ -316,7 +317,7 @@ const DoctorDashboard = () => {
         }}
       />
 
-      <div className="absolute top-0 left-0 w-full h-27 bg-gradient-to-r from-[#0052cc] to-[#00b0ff] z-0 rounded-b-[40px]" />
+      <div className="absolute top-0 left-0 w-full h-27 bg-linear-to-r from-[#0052cc] to-[#00b0ff] z-0 rounded-b-[40px]" />
 
       {/* Header */}
       <Header
@@ -339,6 +340,8 @@ const DoctorDashboard = () => {
 
       {/* History */}
       <HistoryTable currentPatientHistory={currentPatientHistory} lastVisit={lastVisit} />
+
+      <LabReportsSection mrNo={patientsData?.patients?.[0]?.MRNO} />
 
       {/* <Footer /> */}
 

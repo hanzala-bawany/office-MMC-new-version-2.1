@@ -1532,6 +1532,220 @@ const getTodayDoctorPatientsByScreen = async (req, res) => {
   }
 };
 
+
+
+// ------- GET PATIENT FULL DETAILS API (by receiptno) --------------------
+const getPatientFullDetails = async (req, res) => {
+  let connection;
+
+  try {
+    const { receiptNo } = req.params; // /opd/patient-full-details/:receiptNo
+
+    if (!receiptNo || receiptNo.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "receiptNo is required",
+      });
+    }
+
+    const pool = await poolPromise;
+    connection = await pool.getConnection();
+
+    const result = await connection.execute(
+      `
+      BEGIN
+        get_patient_full_details(
+          p_receiptno => :receiptNo,
+          retval      => :cursor
+        );
+      END;
+      `,
+      {
+        receiptNo: receiptNo.trim(),
+        cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
+      },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT },
+    );
+
+    const rs = result.outBinds.cursor;
+    const rows = await rs.getRows();
+    await rs.close();
+
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No patient found for this receiptNo",
+        data: null,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: rows[0], // ek hi receiptno ka ek hi record hota hai
+    });
+  } catch (err) {
+    console.error("getPatientFullDetails error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch patient full details",
+      error: err.message,
+    });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (e) {
+        console.error("Connection close error:", e);
+      }
+    }
+  }
+};
+
+
+
+
+const getPatientLabReports = async (req, res) => {
+
+  let connection;
+
+  console.log(req.query, "<<<<<<<<<< req.query");
+
+  try {
+    let { doctorId, mrNum } = req.query;
+
+    // Normalize strings
+    const normalizeString = (val) =>
+      typeof val === "string" && val.trim() !== "" ? val.trim() : null;
+
+    mrNum = normalizeString(mrNum);
+    doctorId = doctorId ? doctorId : null;
+
+    if (!mrNum) {
+      return res.status(400).json({
+        success: false,
+        message: "MR Number is required",
+      });
+    }
+
+    const pool = await poolPromise;
+    connection = await pool.getConnection();
+
+    const result = await connection.execute(
+      `
+      BEGIN
+        get_patient_history_labs(
+          p_mrno      => :mrNum,
+          p_doctor_id => :doctorId,
+          p_labs    => :cursor1
+        );
+      END;
+      `,
+      {
+        mrNum: mrNum,
+        doctorId: doctorId,
+        cursor1: {
+          dir: oracledb.BIND_OUT,
+          type: oracledb.CURSOR,
+        },
+      },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+        autoCommit: true,
+      },
+    );
+
+    // ✅ Poori history
+    const rs1 = result.outBinds.cursor1;
+    const allRows = await rs1.getRows();
+    await rs1.close();
+    const labReports = groupLabRows(allRows);
+
+    console.log(`${allRows.length} lab records found for MR# ${mrNum}`);
+
+    // Send EXACT database response as-is
+    res.json({
+      success: true,
+      data: labReports, 
+    });
+  } catch (err) {
+    console.error("getPatientHistory error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch patient history",
+      error: err.message,
+    });
+
+  } 
+  finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (e) {
+        console.error("Connection close error:", e);
+      }
+    }
+  }
+
+};
+
+
+// ------- GET PATIENT HISTORY API (sirf lab reports) -------------------------
+// Doctor backend (opd.controller.js) aur patient backend, dono mein yehi function lagao.
+// Ye API ab sirf lab reports deti hai (get_patient_history_labs). Visits wala proc yahan call nahi hota.
+// doctorId diya ho to sirf us doctor ki order ki hui labs; na diya ho to MR ki saari labs.
+
+// Flat lab rows -> [{ receipt, REPORTS: [{ report head, TESTS: [...] }] }]
+const groupLabRows = (rows) => {
+  const receipts = new Map();
+
+  for (const r of rows) {
+    if (!receipts.has(r.LAB_RECEIPTNO)) {
+      receipts.set(r.LAB_RECEIPTNO, {
+        LAB_RECEIPTNO: r.LAB_RECEIPTNO,
+        LAB_DATE: r.LAB_DATE,
+        PATIENT_NAME: r.LAB_PATIENT_NAME,
+        ZERO_CONTACT: r.ZERO_CONTACT === 1,
+        ORDERED_BY_ID: r.ORDERED_BY_ID,
+        ORDERED_BY_NAME: r.ORDERED_BY_NAME,
+        AGE: r.AGE,
+        MR_NNUM: r.MRNO,
+        reports: new Map(),
+      });
+    }
+
+    const rec = receipts.get(r.LAB_RECEIPTNO);
+    const key = `${r.LAB_NO}||${r.REPORTHEAD}`;
+
+    if (!rec.reports.has(key)) {
+      rec.reports.set(key, {
+        LAB_NO: r.LAB_NO,
+        REPORTHEAD: r.REPORTHEAD,
+        REPORT_DATE: r.REPORT_DATE,
+        R_TIME: r.R_TIME,
+        TESTS: [],
+      });
+    }
+
+    rec.reports.get(key).TESTS.push({
+      S_NO: r.S_NO,
+      TESTNAME: r.TESTNAME,
+      RES: r.RES,
+      UNITS: r.UNITS,
+      NV: r.NV,
+    });
+  }
+
+  return [...receipts.values()].map(({ reports, ...rec }) => ({
+    ...rec,
+    REPORTS: [...reports.values()],
+  }));
+};
+
+
+
+
+
 module.exports = {
   getTodayDoctorPatients,
   getDoctorNextPatient,
@@ -1551,4 +1765,6 @@ module.exports = {
   getActiveConsultants1,
   doctorResumeBreak,
   getTodayDoctorPatientsByScreen,
+  getPatientFullDetails,
+  getPatientLabReports
 };

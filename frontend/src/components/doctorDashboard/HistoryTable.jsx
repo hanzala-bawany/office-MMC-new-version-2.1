@@ -12,22 +12,30 @@ import {
   FaClock,
   FaUserMd,
 } from "react-icons/fa";
-import { Card, Button, Table, Modal, Tag, Tabs } from "antd";
+import { Card, Button, Table, Modal, Tag, Tabs, Typography } from "antd";
 import { useState } from "react";
+import ReportsLayout from "../../Layouts/ReportsLayout";
+import CBCReport from "../PatientHistory/CBCReport";
+import UrineReport from "../PatientHistory/UrineReport";
+import KidneyFunction from "../PatientHistory/KidneyFunction";
+
+
+const { Title, Text } = Typography;
 
 
 
 const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
 
-  const [openReport, setOpenReport] = useState(false);
+  const [openReport, setOpenReport] = useState(null);
   const [openVitals, setOpenVitals] = useState(false);
   const [openTreatment, setOpenTreatment] = useState(false);
   const card = "rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 themeBoxShadow";
   const [openPatientDetail, setOpenPatientDetail] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState(null);
+  const [activeReportTab, setActiveReportTab] = useState("cbc");
 
 
-  // console.log(currentPatientHistory, "currentPatientHistory ,,,,,,,,,,,");
+  console.log(currentPatientHistory, "currentPatientHistory ,,,,,,,,,,,");
   // console.log(selectedHistory, "selectedHistory ,,,,,,,,,,,");
   // console.log(lastVisit, "lastVisit ,,,,,,,,,,,");
 
@@ -42,6 +50,11 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
     setOpenVitals(true);
   };
 
+  const openReportModal = (record) => {
+    setSelectedHistory(record);
+    setOpenReport(true);
+    setActiveReportTab("cbc");
+  };
 
 
   const historyColumns = [
@@ -78,20 +91,92 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
     },
     // {
     //   title: "Report",
-    //   render: () => (
-    //     <Button
-    //       icon={<FaMicroscope />}
-    //       className="flex items-center gap-2 border-blue-500 text-blue-500 "
-    //       onClick={() => setOpenReport(true)}
-    //     >
-    //       View
-    //     </Button>
+    //   render: (_, rowData) => (
+    //     <>
+    //       {/* {console.log(rowData, "rowData of reports , ,,,,,,,,,,,,,,,,,,")} */}
+    //       <Button
+    //         icon={<FaMicroscope />}
+    //         className="flex items-center gap-2 border-blue-500 text-blue-500 "
+    //         onClick={() => openReportModal(rowData)}
+    //       >
+    //         View
+    //       </Button>
+    //     </>
     //   ),
     // },
   ];
 
+  // console.log(selectedHistory, "selectedHistory?.MEDICAL_TESTS");
 
+  // const isCBC = selectedHistory?.MEDICAL_TESTS?.toLowerCase().includes("cbc") 
+  // const isUrine = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("urine");
+  // const iskidneyFunction = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidneyfunction") || selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidney function");
 
+  // const getReportTabs = () => {
+
+  //   const tabs = [];
+
+  //   if (isCBC) {
+  //     tabs.push({
+  //       key: "cbc",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaFlask className="text-blue-500" />
+  //           CBC Report
+  //         </span>
+  //       ),
+  //       children: <CBCReport patientData={selectedHistory} />,
+  //     });
+  //   }
+
+  //   if (isUrine) {
+  //     tabs.push({
+  //       key: "urine",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaNotesMedical className="text-green-500" />
+  //           Urine Report
+  //         </span>
+  //       ),
+  //       children: <UrineReport patientData={selectedHistory} />,
+  //     });
+  //   }
+
+  //   if (iskidneyFunction) {
+  //     tabs.push({
+  //       key: "kidneyFunction",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaNotesMedical className="text-green-500" />
+  //           kidney Function Report
+  //         </span>
+  //       ),
+  //       children: <KidneyFunction patientData={selectedHistory} />,
+  //     });
+  //   }
+
+  //   // If no specific tests found, show a message
+  //   if (tabs.length === 0) {
+  //     tabs.push({
+  //       key: "no-report",
+  //       label: (
+  //         <span className="flex items-center gap-2">
+  //           <FaMicroscope className="text-gray-500" />
+  //           No Reports
+  //         </span>
+  //       ),
+  //       children: (
+  //         <div className="p-8 text-center">
+  //           <FaMicroscope className="text-4xl text-gray-300 mx-auto mb-3" />
+  //           <p className="text-gray-500 font-medium">No lab reports available for this visit</p>
+  //           <p className="text-gray-400 text-sm mt-1">Medical tests: {selectedHistory?.MEDICAL_TESTS || 'Not specified'}</p>
+  //         </div>
+  //       ),
+  //     });
+  //   }
+
+  //   return tabs;
+  // };
 
 
   return (
@@ -229,7 +314,7 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
               label: "Medical Tests",
               children: (
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  {selectedHistory?.MEDICAL_TESTS?.split(",").join(" -- ") || "No Data"}
+                  {selectedHistory?.MEDICAL_TESTS?.split(",").join("  ,  ") || "No Data"}
                 </div>
               ),
             },
@@ -285,9 +370,57 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
         />
       </Modal>
 
+      {/* =====================  Report Component ===================== */}
+
+      {/* <Modal
+        open={openReport}
+        onCancel={() => setOpenReport(false)}
+        footer={null}
+        centered
+        width={900}
+        className="report-modal"
+        styles={{
+          body: {
+            padding: 0,
+            maxHeight: '80vh',
+            overflowY: 'auto',
+          }
+        }}
+        closeIcon={
+          <span className="text-red-600 hover:text-red-800 bg-red-100 px-1 text-xl font-bold transition-colors">
+            X
+          </span>
+        }
+
+      >
+
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold text-gray-700 flex items-center gap-2">
+            <FaMicroscope className="text-purple-600" />
+            Lab Reports
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 mr-4">
+              {selectedHistory?.PATIENTNAME} | MR: {selectedHistory?.MRNO}
+            </span>
+          </div>
+        </div>
+
+        <Tabs
+          activeKey={activeReportTab}
+          onChange={(key) => setActiveReportTab(key)}
+          items={getReportTabs()}
+          tabBarStyle={{ marginBottom: 0 }}
+
+        />
+
+      </Modal> */}
+
+      {/* ===================== History ===================== */}
 
       <Card
         title={
+
           <div className="flex justify-between items-center w-full">
 
             <div className="flex items-center  text-md sm:text-lg gap-2 font-bold text-slate-700">

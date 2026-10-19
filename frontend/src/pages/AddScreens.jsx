@@ -123,7 +123,7 @@ const AddScreens = () => {
 
     // ✅ Updated handleEdit - ONLY sets pronounce name, NOT doctor
     const handleEdit = (record) => {
-        console.log(record, "////////////");
+        // console.log(record, "////////////");
 
         // Convert FACULTY array to selectedFaculties format (id, name)
         const formattedFaculties = (record?.FACULTY || []).map(faculty => ({

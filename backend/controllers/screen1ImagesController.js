@@ -3,6 +3,7 @@ const poolPromise = require("../database.js");
 
 
 const manageScreen1Images = async (req, res) => {
+  
   let { action, status, id } = req.body || {};
   const file = req.file || null;
   let connection;

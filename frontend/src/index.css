@@ -1,19 +1,17 @@
 @import "tailwindcss";
 
-
 @theme {
   /* New custom breakpoints add karo */
-  --breakpoint-3xl: 130rem;  /* 1920px */
-  --breakpoint-4xl: 160rem;  /* 2560px */
-  --breakpoint-5xl: 200rem;  /* 3200px */
-  --breakpoint-6xl: 240rem;  /* 3840px (8K) */
+  --breakpoint-3xl: 130rem; /* 1920px */
+  --breakpoint-4xl: 160rem; /* 2560px */
+  --breakpoint-5xl: 200rem; /* 3200px */
+  --breakpoint-6xl: 240rem; /* 3840px (8K) */
 }
 
 body {
   margin: 0;
   padding: 0;
 }
-
 
 .dashBtn {
   border: 2px solid;
@@ -28,7 +26,7 @@ body {
   cursor: pointer;
 }
 
-@media only screen and (min-width : 600px) {
+@media only screen and (min-width: 600px) {
   .dashBtn {
     border: 2px solid;
     padding: 6px 10px !important;
@@ -41,7 +39,6 @@ body {
     align-items: center;
     cursor: pointer;
   }
-
 }
 
 .dashBtn:hover {
@@ -49,14 +46,11 @@ body {
 }
 
 .themeBoxShadow {
-  box-Shadow: 1px 3px 10px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: 1px 3px 10px 1px rgba(0, 0, 0, 0.15);
   /* box-Shadow: 1px 2px 10px 1px rgba(0, 0, 0, 0.15); */
 }
 
-
-
 @layer utilities {
-
   /* Custom scrollbar styles */
   .custom-scrollbar::-webkit-scrollbar {
     width: 16px;
@@ -90,12 +84,8 @@ body {
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: #888 transparent;
-
   }
-
-
 }
-
 
 /* .ant-table-body::-webkit-scrollbar {
   display: none;
@@ -106,8 +96,35 @@ body {
   scrollbar-width: none;
 } */
 
-
-.patientCardFont{
+.patientCardFont {
   font-family: "Playwrite NZ Basic", cursive;
   /* font-family: "Arimo", sans-serif; */
+}
+
+/* for antdesign table */
+
+.row-deleted > td {
+  background-color: #ffc2be !important;
+}
+
+.row-deleted:hover > td {
+  background-color: #ffa8a0 !important;
+}
+
+.user-session-table .ant-table-thead > tr > th {
+  background-color: #1677ff !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-bottom: none !important;
+}
+
+.user-session-table .ant-table-thead > tr > th::before {
+  display: none !important;
+}
+
+.selected-row > td {
+  background-color: #b3deff !important;
+}
+.selected-row:hover > td {
+  background-color: #bae0ff !important;
 }

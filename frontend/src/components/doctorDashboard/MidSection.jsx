@@ -14,6 +14,7 @@ import VoiceTextAreaOnline from "./VoiceTextAreaOnline";
 import AiAssistant from "./AiAssistant";
 import { BulbOutlined } from "@ant-design/icons";
 import StopModal from "./StopModal";
+import { useNavigate } from "react-router-dom";
 
 const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHandlerParent, formData, setFormData }) => {
 
@@ -47,6 +48,7 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
 
   const [cooldown, setCooldown] = useState(0); // 0 matlab timer nahi chal raha
   const cooldownRef = useRef(null);
+  const navigate = useNavigate()
 
 
   const startBreak = () => {
@@ -101,6 +103,9 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
   const disableSkip = isSkipLoading || !hasCurrentPatient || isOnBreak || isFakePatientActive || isCoolingDown;
   const disableRepeatCall = !currentPatientsData || isOnBreak || isFakePatientActive || isCoolingDown;
   const disableAddVitals = !currentPatientsData || isOnBreak || isFakePatientActive;
+  const currentFaculty = loginUserData?.faculty ||"Physician"; 
+
+
 
   // let patintsW8ing;
 
@@ -533,13 +538,64 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
     </Button>
   }
 
+  const PrintBtn = () => {
+
+    
+
+    return (
+
+      <button
+        onClick={handlePrintReport}
+        disabled={!patientsData?.patients?.[0]}
+        className={`
+          flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium
+          transition-all duration-200 ease-in-out m-2 mx-4
+          ${patientsData?.patients?.[0]
+            ? 'border border-blue-600 text-blue-600 hover:bg-blue-50 hover:shadow-lg active:scale-95 cursor-pointer'
+            : 'border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+          }
+          w-auto  
+      `}
+      >
+        print / Preview
+      </button>
+    )
+
+  }
+
+
+  const handlePrintReport = () => {
+
+    // Check if patient data exists
+    if (!patientsData?.patients?.[0]) {
+      toast.warning('No patient data available to print');
+      return;
+    }
+
+    if (!formData?.treatment) {
+      toast.warning('Treatment is required');
+      return;
+    }
+
+    const reportData = {
+      patient: patientsData?.patients?.[0],
+      vitals: patientsData?.patientVitals?.[0],
+      formData: formData,
+      doctorData: loginUserData,
+      lastVisit: lastVisit
+    };
+
+    navigate('/prescriptionReport' , {
+      state : { reportData : reportData }
+    });
+    
+  };
+
 
 
   return (
 
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-6 2xl:grid-cols-2 mb-8 h-auto xl:grid-rows-1">
-
-
 
       {/* Pie Chart - sirf xl/laptop pe */}
       <div className="hidden xl:flex 2xl:hidden order-3 xl:order-3 themeBoxShadow border-none outline-none rounded-[10px] z-10 bg-white flex-col justify-between min-h-40">
@@ -801,6 +857,7 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                 </span>
               </div>
             </div>
+
           </div>
 
           {/* BODY */}
@@ -1066,6 +1123,8 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
 
           </div>
 
+          <PrintBtn />
+
         </div>
 
         {isCoolingDown && (
@@ -1132,6 +1191,7 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
         onAddMedicines={handleAddMedicinesFromAI}
         onAddMedicinePlan={handleAddMedicinePlanFromAI}
         onAddTreatment={handleAddTreatmentFromAI}
+        faculty={currentFaculty}
       />
 
     </div>

@@ -8,7 +8,7 @@ const poolPromise = require("../database.js");
 
 //-------HELPER FUNCTIONS START--------------------
 
- const getScreensForFaculty = async (connection, facultyId) => {
+const getScreensForFaculty = async (connection, facultyId) => {
   try {
     const result = await connection.execute(
       `SELECT screen_id FROM screen_faculty_map 
@@ -22,7 +22,7 @@ const poolPromise = require("../database.js");
   }
 };
 
- const getDoctorFacultyId = async (connection, doctorId) => {
+const getDoctorFacultyId = async (connection, doctorId) => {
   try {
     const result = await connection.execute(
       `SELECT facultyid FROM hms.consultant WHERE id = :id`,
@@ -50,9 +50,7 @@ const emitToScreens = async (connection, io, doctorId, payload) => {
   }
 };
 
-
 //                END
-
 
 const unifiedLogin = async (req, res) => {
   const { username, password } = req.body;
@@ -105,7 +103,7 @@ const unifiedLogin = async (req, res) => {
       let role = "";
 
       if (userrole === 1) {
-        role = "admin";
+        role = "Admin";
       } else {
         role = "screen";
       }
@@ -114,7 +112,7 @@ const unifiedLogin = async (req, res) => {
         { id: userid, username, role },
         process.env.JWT_SECRET,
         {
-          expiresIn: "1d",
+          expiresIn: "30d",
         },
       );
 
@@ -130,7 +128,7 @@ const unifiedLogin = async (req, res) => {
     // ================== 2️⃣ HMS MEDICAL ASSISTANT ==================
     const hmsResult = await connection.execute(
       `BEGIN
-      hms_user_login(:username,:password,:status,:message,:userlevel);
+      hms_user_login(:username,:password,:status,:message,:userlevel,  :isprevioussessionopen);
    END;`,
       {
         username,
@@ -146,22 +144,34 @@ const unifiedLogin = async (req, res) => {
           type: oracledb.STRING,
           maxSize: 50,
         },
+        isprevioussessionopen: {
+          dir: oracledb.BIND_OUT,
+          type: oracledb.NUMBER,
+          maxSize: 10,
+        },
       },
     );
 
-    const { status: hmsStatus, userlevel } = hmsResult.outBinds;
+    const {
+      status: hmsStatus,
+      message: hmsMessage,
+      userlevel,
+      isprevioussessionopen = null,
+    } = hmsResult.outBinds;
 
     if (hmsStatus === 1) {
       const token = jwt.sign(
-        { username, role: "medical_assistant" },
+        { username, role: userlevel },
         process.env.JWT_SECRET,
-        { expiresIn: "1d" },
+        { expiresIn: "30d" },
       );
 
       return res.json({
         success: true,
-        role: "medical_assistant",
+        role: userlevel,
+        message: hmsMessage,
         token,
+        isprevioussessionopen,
       });
     }
 
@@ -224,7 +234,7 @@ const unifiedLogin = async (req, res) => {
           faculty: doctor.FACULTY,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "1d" },
+        { expiresIn: "30d" },
       );
 
       const io = req.app.get("io");
@@ -344,6 +354,7 @@ const forceLogoutDoctor = async (req, res) => {
   let connection;
 
   try {
+ 
     const { consultantId } = req.body;
     const adminSession = req.user?.username || "Admin";
 
@@ -406,6 +417,5 @@ const forceLogoutDoctor = async (req, res) => {
     if (connection) await connection.close().catch(() => {});
   }
 };
-
 
 module.exports = { unifiedLogin, logoutDoctor, forceLogoutDoctor };

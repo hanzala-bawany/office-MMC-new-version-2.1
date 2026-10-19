@@ -20,6 +20,7 @@ import LoginPage from './pages/LoginPage'
 import AdminDisplayParent from './routes/AdminDisplayParent'
 import AuthParent from './routes/AuthParent'
 import ScreenDisplayParent from './routes/ScreenDisplayParent'
+import ReceptionistParent from './routes/ReceptionistParent'
 import Screen5Display from './pages/Screen5Display'
 import DoctorDashboard from './pages/DoctorDashboard'
 import DocotorParent from './routes/DocotorParent'
@@ -29,6 +30,14 @@ import PronunciationPage from './pages/PronunciationPage'
 import AddRemoveLogoutDoctor from './pages/AddRemoveLogoutDoctor'
 import DoctorSetupPage from './components/doctorDashboard/Doctorsetuppage'
 import AddScreens from './pages/AddScreens'
+import PrescriptionReport from './pages/PrescriptionReport'
+import OpdReceiptPage from './pages/OpdReceiptPage'
+import ReceptionistPage from './pages/ReceptionistDashboard'
+import PartialPaymentPage from './pages/PartialPaymentPage'
+import UserSessionPage from './pages/UserSessionPage'
+import CurrentCashPage from './pages/CurrentCashPage'
+import ChangePassword from './pages/settings/ChangePassword'
+import SharingReportPage from './pages/SharingReportPage'
 
 
 function App() {
@@ -39,8 +48,9 @@ function App() {
       <Routes>
 
         {/* AppLayout wale routes */}
-        <Route element={<AdminDisplayParent />}>
-          <Route element={<AppLayout />}>
+        <Route element={<AppLayout />}>
+
+          <Route element={<AdminDisplayParent />}>
             <Route index element={<Home />} />
             <Route path="/screen1" element={<Screen1Page />} />
             <Route path="/screen2" element={<Screen2Page />} />
@@ -53,7 +63,26 @@ function App() {
             <Route path="/pronunciation" element={<PronunciationPage />} />
             <Route path="/removeDoctor" element={<AddRemoveLogoutDoctor />} />
             <Route path="/addScreens" element={<AddScreens />} />
+            <Route path="/sharingReport" element={<SharingReportPage />} />
           </Route>
+
+          <Route element={<ReceptionistParent />}>
+            <Route path="/receptionist" element={<ReceptionistPage />} />
+            <Route path="/opdReceiptPage" element={<OpdReceiptPage />} />
+            <Route path="/partialPaymentPage" element={<PartialPaymentPage />} />
+            <Route path="/userSessionPage" element={<UserSessionPage />} />
+            <Route path="/currentCashPage" element={<CurrentCashPage />} />
+            <Route path="/changePassword" element={<ChangePassword />} />
+          </Route>
+
+        </Route>
+
+        {/*  Reprts*/}
+        <Route path="/prescriptionReport" element={<PrescriptionReport />} />
+
+        {/*  Medical Assistant */}
+        <Route element={<MedicalAssistantParent />}>
+          <Route path="/medicalAssistant" element={<MedicalAssistant />} />
         </Route>
 
         {/* Screen Displays */}
@@ -63,23 +92,21 @@ function App() {
           <Route path="/screen3display" element={<Screen3Display />} />
           <Route path="/screen4display" element={<Screen4Display />} />
         </Route>
-          <Route path="/screen/:screenNum" element={<Screen5Display />} />
+        <Route path="/screen/:screenNum" element={<Screen5Display />} />
 
 
+        {/*  Doctor*/}
         <Route element={<DocotorParent />}>
           <Route path="/doctorDashboard" element={<DoctorDashboard />} />
           <Route path="/doctorSetupPage" element={<DoctorSetupPage />} />
+          <Route path="/doctorDashboard/report" element={<SharingReportPage />} />
         </Route>
-
-        <Route element={<MedicalAssistantParent />}>
-          <Route path="/medicalAssistant" element={<MedicalAssistant />} />
-        </Route>
-
 
         {/* Auth Routes */}
         <Route element={<AuthParent />}>
           <Route path="/login" element={<LoginPage />} />
         </Route>
+
 
         <Route path="/*" element={<NotFoundPage />} />
 

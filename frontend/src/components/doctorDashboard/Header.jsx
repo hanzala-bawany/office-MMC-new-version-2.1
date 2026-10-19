@@ -14,6 +14,7 @@ import {
   FaUserCheck,
   FaUserClock,
   FaUserTimes,
+  FaFileInvoiceDollar,
 } from "react-icons/fa";
 import { base_URL } from "../../utills/baseUrl";
 import axios from "axios";
@@ -229,6 +230,18 @@ const Header = ({ doctorData, patientsData, onStartTour, loginUserData, specific
               {patientsData?.patientsCanceled || 0}
             </span>
           </div>
+
+          <Button
+            block
+            icon={<FaFileInvoiceDollar />}
+            onClick={() => {
+              setOpenProfile(false);
+              navigate("/doctorDashboard/report");
+            }}
+            className="rounded-xl flex items-center justify-center gap-2 mb-2 border-green-400 text-green-600 hover:bg-green-50"
+          >
+            Generate &amp; Download Report
+          </Button>
 
           {/* 👇 Help Tour Button — modal band karke tour start karega */}
           <Button

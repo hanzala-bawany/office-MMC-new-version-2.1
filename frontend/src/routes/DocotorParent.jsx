@@ -13,7 +13,7 @@ const DocotorParent = () => {
     useEffect(() => {
         if (!isUserLogin) {
             toast.warning("You have to login first");
-        } else if (loginUserData?.role !== "doctor" && loginUserData?.role !== "admin") {
+        } else if (loginUserData?.role !== "doctor" && loginUserData?.role !== "Admin") {
             toast.error("Access denied");
         }
     }, [isUserLogin, loginUserData]);

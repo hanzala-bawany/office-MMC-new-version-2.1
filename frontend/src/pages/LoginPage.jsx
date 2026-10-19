@@ -34,7 +34,6 @@ const LoginPage = () => {
     // console.log(inputs , "<<<<<<<<<<<<");
   }
 
-
   // console.log(savedUsername, "savedUsername");
   // console.log(savedPassword, "savedPassword");
 
@@ -49,18 +48,20 @@ const LoginPage = () => {
     try {
       setLoading(true);
       const res = await axios.post(`${base_URL}/api/auth/login`, inputs);
-      // console.log(res, "login res <<<<<<<<<<<");
+      console.log(res , "login user res .....................");
       const token = res.data.token;
       const decoded = jwtDecode(token);
-      console.log(decoded, "decoded <<<<<<");
+      const userData = { ...decoded , isprevioussessionopen : res?.data?.isprevioussessionopen }
+
+      // console.log(userData, "login userData <<<<<<");
 
 
-      localStorage.setItem("loginUserData", JSON.stringify(decoded))
+      localStorage.setItem("loginUserData", JSON.stringify(userData))
       localStorage.setItem("loginUser", JSON.stringify(token));
-      dispatch(loginUser(decoded));
+      dispatch(loginUser(userData));
       setLoading(false);
 
-      if (decoded.role === "admin") {
+      if (decoded.role === "Admin") {
 
         navigate("/");
 
@@ -72,19 +73,24 @@ const LoginPage = () => {
         navigate("/doctorSetupPage");
 
       }
-      else if (decoded.role === "medical_assistant") {
+      else if (decoded.role === "Medical Assistant") {
 
         navigate("/medicalAssistant");
 
       }
-      else if (decoded?.role == "screen" && decoded?.id >= 6 && decoded?.id <= 10) {
+      else if (decoded.role === "Receptionist" || decoded.role?.split("|")[0] === "Receptionist") {
+
+        navigate("/receptionist");
+
+      }
+      else if (decoded?.role == "screen" && decoded?.id >= 6 && decoded?.id <= 10) {        //  decoded?.id = 6 means screen 5
 
         const screenAccessMap = {
-          "005Screen5": { path: "/screen", id: 6  , num : 5},
-          "006Screen6": { path: "/screen", id: 7 , num : 6},
-          "007Screen7": { path: "/screen", id: 8 , num : 7},
-          "008Screen8": { path: "/screen", id: 9 , num : 8},
-          "009Screen9": { path: "/screen", id: 10 , num : 9},
+          "005Screen5": { path: "/screen", id: 6, num: 5 },
+          "006Screen6": { path: "/screen", id: 7, num: 6 },
+          "007Screen7": { path: "/screen", id: 8, num: 7 },
+          "008Screen8": { path: "/screen", id: 9, num: 8 },
+          "009Screen9": { path: "/screen", id: 10, num: 9 },
         };
 
         const screen = screenAccessMap[decoded.username];

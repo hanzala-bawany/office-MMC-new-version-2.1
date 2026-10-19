@@ -15,10 +15,11 @@ const userSlice = createSlice({
     },
     logoutUser: (state) => {
       state.loginUser = null;
-      localStorage.removeItem('loginUser');
-      localStorage.removeItem('loginUserData');
-      localStorage.removeItem('persist:doctor');
-      localStorage.removeItem('persist:user');
+      // localStorage.removeItem('loginUser');
+      // localStorage.removeItem('loginUserData');
+      // localStorage.removeItem('persist:doctor');
+      // localStorage.removeItem('persist:user');
+      localStorage.clear();
     },
   },
 })

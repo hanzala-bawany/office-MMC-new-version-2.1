@@ -60,6 +60,8 @@ const LogoutDoctor = () => {
 
         } catch (err) {
             toast.error(err || "Delete failed");
+            console.log(err , "err in handle Logout Doctor by id");
+            
         } finally {
             setLoading(false);
         }

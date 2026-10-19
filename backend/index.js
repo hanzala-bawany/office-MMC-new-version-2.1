@@ -2,6 +2,8 @@ const express = require("express");
 require("./database.js");
 const cors = require("cors");
 const path = require("path");
+const { baseDir } = require("./paths.js");
+require("dotenv").config({ path: path.join(baseDir, ".env"), quiet: true });
 const http = require("http");
 const { Server } = require("socket.io");
 // Routes
@@ -22,8 +24,11 @@ const patientLoginRoutes = require("./routes/patientLogin.Routes.js")
 const displayScreenRoutes = require("./routes/screenDisplayRoutes.js");
 const consultantRoutes = require("./routes/consultantRoutes");
 const consultantFacultyRoutes = require("./routes/consultantFacultyRoutes");
-const doctorReportRoutes = require("./routes/doctorReport.Routes.js")
 const { initSocket } = require("./utills/socket.js");
+const receptionistRoutes = require("./routes/receptionistRoutes.js");
+const partialPaymentRoutes = require("./routes/partialpayment.js");
+const { startOpdWatcher } = require("./utills/opdPatientsWatcher.js");
+const routes = require("./routes/index.js");
 
 
 
@@ -52,7 +57,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-app.use("/assets", express.static(path.join(process.cwd(), "assets")));
+app.use("/assets", express.static(path.join(baseDir, "assets")));
 app.use("/api/auth", authRoutes);
 app.use("/api/faculty", facultyRoutes);
 app.use("/api/screen2images", screen2ImagesRoutes);
@@ -69,46 +74,13 @@ app.use("/api/patient", patientLoginRoutes);
 app.use("/api/admin", displayScreenRoutes);
 app.use("/api/consultants", consultantRoutes);
 app.use("/api/consultant", consultantFacultyRoutes);
-app.use("/api/", doctorReportRoutes);
+app.use("/api/receptionist", receptionistRoutes);
+app.use("/api/partialPayment", partialPaymentRoutes);
+app.use("/api", routes);
 
 
-let lastCreatedTime = null;
 
-async function startOpdWatcher(io) {
-  setInterval(async () => {
-    let connection;
 
-    try {
-      const pool = await poolPromise;
-      connection = await pool.getConnection();
-
-      const result = await connection.execute(
-        `SELECT MAX(createdtime) FROM hms.opdreceipt`,
-      );
-
-      const currentValue = result.rows[0][0];
-
-      if (
-        lastCreatedTime !== null &&
-        currentValue &&
-        new Date(currentValue).getTime() !== new Date(lastCreatedTime).getTime()
-      ) {
-        io.emit("opdUpdated", {
-          message: "New OPD Receipt Added",
-          time: new Date(),
-        });
-      }
-
-      lastCreatedTime = currentValue;
-    } catch (err) {
-      console.error("Watcher Error:", err);
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
-    }
-  }, 5000);
-}
 
 // ✅ Server Start
 server.listen(PORT, async () => {

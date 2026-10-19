@@ -6,19 +6,19 @@ const MedicalAssistantParent = () => {
 
 
     const isUserLogin = JSON.parse(localStorage.getItem("loginUser"));
-    const loginUserData = JSON.parse(localStorage.getItem("loginUserData"));
+    const loginUserData = JSON.parse(localStorage.getItem("loginUserData") || "{}");
 
-    console.log(isUserLogin , "isUserLogin");
-    console.log(loginUserData , "loginUserData");
+    // console.log(isUserLogin , "isUserLogin");
+    // console.log(loginUserData , "loginUserData");
     
 
 
-    const isAllow = loginUserData?.role == "medical_assistant"
+    const isAllow = loginUserData?.role === "Medical Assistant" || loginUserData?.role === "Admin";
 
     useEffect(() => {
         if (!isUserLogin) {
             toast.warning("You have to login first");
-        } else if (loginUserData?.role !== "medical_assistant" && loginUserData?.role !== "admin") {
+        } else if (loginUserData?.role !== "Medical Assistant" && loginUserData?.role !== "Admin") {
             toast.error("Access denied");
         }
     }, [isUserLogin, loginUserData]);
@@ -26,7 +26,7 @@ const MedicalAssistantParent = () => {
     return (
         <>
             {
-                isAllow ? <Outlet /> : <Navigate to={"/"} />
+                isAllow ? <Outlet /> : <Navigate to={"/"}   />
             }
         </>
     )
