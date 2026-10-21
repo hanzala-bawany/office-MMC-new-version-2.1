@@ -59,7 +59,7 @@ const LogoutDoctor = () => {
             setSelectedDoctorId(null);
 
         } catch (err) {
-            toast.error(err || "Delete failed");
+            toast.error(err?.response?.data?.message || "Delete failed");
             console.log(err , "err in handle Logout Doctor by id");
             
         } finally {

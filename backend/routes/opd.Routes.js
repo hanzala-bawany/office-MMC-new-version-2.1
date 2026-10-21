@@ -11,7 +11,7 @@ router.post("/doctor/patient-skipped", getDoctorNextPatientSkip);
 router.post("/doctor/patient-skipped-call", getDoctorNextPatientQueue);
 router.post("/doctor/patient-cancel-all", cancelAllDoctorPatients);
 router.post("/doctor/patient-specific-call", doctorCallTokenByNumber);
-router.post("/doctor/patient-specific-call", doctorCallTokenByNumber);
+// router.post("/doctor/patient-specific-call", doctorCallTokenByNumber);
 router.post("/doctor/patient-repeat-call", repeatCallPatient);
 router.get("/consultants/active", getActiveConsultants);
 router.post("/doctor/patient-vitals/add", addPatientVitals);
