@@ -30,9 +30,9 @@ const MedicalAssistantRow = ({ item, index }) => (
     >
       <FaUser />
     </div>
-    <Field label="Patient Name" value={item.patient} big />
+    <Field label="Doctor Name" value={item.patient} big />
     <Field label="Token No" value={item.token} big />
-    <Field label="Medical Assistant" value={item.assistant} />
+    <Field label="Counter Number" value={item.assistant} />
   </div>
 );
 

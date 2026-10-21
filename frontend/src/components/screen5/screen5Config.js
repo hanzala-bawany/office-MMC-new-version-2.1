@@ -24,15 +24,15 @@ export const STATUS = {
 
 // ---------- STATIC DATA (replace with API later) ----------
 export const MEDICAL_ASSISTANT_STATIC = [
-  { id: 1, patient: "Sara Khan", token: "V 006", assistant: "Ayesha Farooq" },
-  { id: 2, patient: "Bilal Ahmed", token: "V 014", assistant: "Dr. Moin Agahi" },
-  { id: 3, patient: "Ayesha Farooq", token: "V 016", assistant: "Dr. Tanzeem" },
+  { id: 1, patient: "Sara Khan", token: "V 006", assistant: "2" },
+  { id: 2, patient: "Bilal Ahmed", token: "V 014", assistant: "3" },
+  { id: 3, patient: "Ayesha Farooq", token: "V 016", assistant: "4" },
 ];
 
 export const SKIPPED_STATIC = [
-  { id: 1, patient: "Hassan Raza", token: "V 012", doctor: "Dr. Majid Khan", room: "2" },
-  { id: 2, patient: "Bilal Ahmed", token: "V 014", doctor: "Dr. Moin Agahi", room: "3" },
-  { id: 3, patient: "Ayesha Farooq", token: "V 016", doctor: "Dr. Tanzeem", room: "2" },
-  { id: 4, patient: "Nadia Ali", token: "V 021", doctor: "Dr. Rashid Mehmood", room: "3" },
-  { id: 5, patient: "Zafar Khan", token: "V 023", doctor: "Dr. Zahid Qadri", room: "1" },
+  { id: 1, patient: "8", token: "V 012", doctor: "Dr. Majid Khan", room: "2" },
+  { id: 2, patient: "2", token: "V 014", doctor: "Dr. Moin Agahi", room: "3" },
+  { id: 3, patient: "4", token: "V 016", doctor: "Dr. Tanzeem", room: "2" },
+  { id: 4, patient: "2", token: "V 021", doctor: "Dr. Rashid Mehmood", room: "3" },
+  { id: 5, patient: "5", token: "V 023", doctor: "Dr. Zahid Qadri", room: "1" },
 ];

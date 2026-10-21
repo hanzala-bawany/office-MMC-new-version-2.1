@@ -20,7 +20,6 @@ import DoctorCallPanel from "../components/MedicalAssistant/DoctorCallPanel";
 import MyQueuePanel from "../components/MedicalAssistant/MyQueuePanel";
 
 const MedicalAssistant = () => {
-    
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -111,9 +110,9 @@ const MedicalAssistant = () => {
           backgroundImage: `radial-gradient(ellipse 80% 50% at 20% -10%, rgba(99,102,241,0.15) 0%, transparent 60%),radial-gradient(ellipse 60% 40% at 80% 110%, rgba(59,130,246,0.12) 0%, transparent 60%)`,
         }}
       >
-        {/* HEADER */}
-        <header className="flex-1 flex items-center justify-between mb-7">
 
+        {/* HEADER */}
+        <header className="flex-1 flex flex-wrap items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-4 [@media(min-width:3200px)]:gap-8 [@media(min-width:4400px)]:gap-12">
             <img
               src={hospitraxLogo}
@@ -185,11 +184,10 @@ const MedicalAssistant = () => {
               </div>
             </div>
           </div>
-
         </header>
 
         {/* BODY */}
-        <main className="flex-8 flex flex-col items-center gap-6 w-full">
+        <main className="flex-8 flex flex-col  items-center gap-6 w-full">
 
           {/* Existing patient form */}
           <div
@@ -207,19 +205,12 @@ const MedicalAssistant = () => {
             />
           </div>
 
-          {/* Call sections: mobile 1 column, lg par 2 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 w-full max-w-5xl">
-            <DoctorCallPanel
-              doctors={doctors}
-              patients={doctorPatients}
-              {...doctorHandlers}
-            />
-            <MyQueuePanel
-              queue={myQueue}
-              currentPatient={myCurrent}
-              {...myQueueHandlers}
-            />
-          </div>
+          {/* Call panels: mobile par 1 column, lg par 2 columns */}
+          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 w-full max-w-5xl">
+            <DoctorCallPanel />
+            <MyQueuePanel />
+          </div> */}
+
 
         </main>
 
@@ -321,6 +312,7 @@ const MedicalAssistant = () => {
           </div>
         </div>
       </Modal>
+
     </>
   );
 };

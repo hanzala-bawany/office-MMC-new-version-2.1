@@ -164,7 +164,7 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
 
     const [selectedDoctorId, setSelectedDoctorId] = useState(null);
 
-    console.log(selectedPatient, "<<<<< selectedPatient");
+    // console.log(selectedPatient, "<<<<< selectedPatient");
     // console.log(selectedDoctorId, "<<<<< selectedDoctorId");
 
     // Vitals form state
@@ -174,7 +174,7 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
     const [docotorPatients, setDocotorPatients] = useState([]);
     const [docotors, setDocotor] = useState([]);
 
-    console.log(vitals, "..... vitals");
+    // console.log(vitals, "..... vitals");
     // console.log(docotorPatients , "..... docotorPatients");
 
 

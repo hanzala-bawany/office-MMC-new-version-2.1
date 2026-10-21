@@ -176,44 +176,7 @@ const Screen5Display = () => {
       `}</style>
 
       {/* HEADER */}
-      <header
-        className="relative z-20 flex items-center justify-between px-6 py-3 min-[2000px]:py-4 [@media(min-width:4400px)]:py-7 gap-6 shrink-0"
-        style={{ background: "rgba(6,26,51,0.9)", borderBottom: "1px solid rgba(56,189,248,0.25)" }}
-      >
-        <div className="flex items-center gap-3 min-w-[160px]">
-          <img src={hospitraxLogo} alt="Hospitrax" className="bg-amber-50 w-14 min-[2000px]:w-20 [@media(min-width:4400px)]:w-28 object-contain rounded-full p-2 border border-blue-400" />
-          <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1">
-            <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`} />
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300 min-[2000px]:text-xs">
-              {isConnected ? "Live" : "Off"}
-            </span>
-          </div>
-        </div>
-
-        <div
-          onClick={() => { voiceQueueRef.current.push({ token: "System", doctor: "system" }); playNextVoice(); }}
-          className="flex items-center gap-4 cursor-pointer"
-        >
-          <img src={logo} alt="MMC" className="h-12 w-12 min-[2000px]:h-16 min-[2000px]:w-16 [@media(min-width:4400px)]:h-28 [@media(min-width:4400px)]:w-28 object-contain" />
-          <div>
-            <h1 className="text-white font-black text-2xl min-[2000px]:text-4xl [@media(min-width:3200px)]:text-5xl [@media(min-width:4400px)]:text-7xl tracking-wide leading-none">
-              Memon Medical Complex
-            </h1>
-            <p className="text-cyan-300 text-xs min-[2000px]:text-xl [@media(min-width:3200px)]:text-2xl [@media(min-width:4400px)]:text-4xl italic mt-0.5">
-              "Serving with Excellence & Care"
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6 min-w-[160px]">
-          <LiveClock />
-          <div className="px-5 py-1.5 rounded-xl" style={{ background: "rgba(14,165,233,0.2)", border: "1px solid rgba(56,189,248,0.4)" }}>
-            <span className="text-sky-200 text-xs font-semibold uppercase tracking-widest min-[2000px]:text-sm mr-2">Screen</span>
-            <span className="text-white text-3xl font-black tabular-nums min-[2000px]:text-4xl [@media(min-width:4400px)]:text-6xl">{screenNum}</span>
-          </div>
-        </div>
-      </header>
-      {/* <header className="s5-header relative z-20 flex items-center justify-between px-8 py-3 min-[2000px]:py-4 [@media(min-width:4400px)]:py-7 gap-6 shrink-0">
+      <header className="s5-header relative z-20 flex items-center justify-between px-8 py-3 min-[2000px]:py-4 [@media(min-width:4400px)]:py-7 gap-6 shrink-0">
              
         <div className="flex items-center gap-3 min-w-[160px]">
 
@@ -226,7 +189,8 @@ const Screen5Display = () => {
             />
           </div>
 
-          <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1">
+          <div className="flex items-center  bg-white/5 border border-white/10 rounded-full px-3 py-1">
+            <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`} />
             <span
               className={`w-2 h-2 rounded-full ${isConnected ? "s5-dot-live" : "s5-dot-off"}`}
             />
@@ -270,18 +234,20 @@ const Screen5Display = () => {
         <div className="flex items-end gap-8 min-w-[160px]">
           <LiveClock />
           <div className="s5-screen-badge px-5 py-1.5 min-[2000px]:px-7 min-[2000px]:py-2">
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-2 border-2 border-blue-400 rounded-2xl px-2">
               <span className="text-cyan-400/80 text-xs font-semibold uppercase tracking-widest min-[2000px]:text-sm">
                 Screen
               </span>
               <span className="text-white text-2xl font-black tabular-nums min-[2000px]:text-3xl [@media(min-width:3200px)]:text-4xl [@media(min-width:4400px)]:text-5xl">
                 {screenNum}
               </span>
+
             </div>
           </div>
         </div>
 
-      </header> */}
+      </header>
 
       {/* BODY: parent -> Left (60%) + Right (40%) */}
       <main className="relative z-10 flex-1 grid grid-cols-[3fr_2fr] gap-4 min-[2000px]:gap-6 min-h-0 px-5 pt-4 pb-2 min-[2000px]:px-8 [@media(min-width:4400px)]:px-12">
@@ -294,7 +260,7 @@ const Screen5Display = () => {
       </main>
 
       {/* TICKER */}
-      <div className="relative z-10 overflow-hidden shrink-0" style={{ background: "rgba(14,165,233,0.1)", borderTop: "1px solid rgba(56,189,248,0.2)" }}>
+      {/* <div className="relative z-10 overflow-hidden shrink-0" style={{ background: "rgba(14,165,233,0.1)", borderTop: "1px solid rgba(56,189,248,0.2)" }}>
         <div className="s5-ticker-inner py-2">
           {[1, 2].map((_, ri) => (
             <div key={ri} className="flex items-center gap-12 pr-12 shrink-0">
@@ -311,11 +277,11 @@ const Screen5Display = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* FOOTER */}
       <footer className="relative z-20 flex items-center justify-center gap-3 py-2 min-[2000px]:py-3 shrink-0" style={{ background: "rgba(6,26,51,0.9)" }}>
-        <span className="text-slate-300 text-lg [@media(min-width:3200px)]:text-xl [@media(min-width:4400px)]:text-3xl font-medium cursor-pointer" onClick={logoutHandler}>
+        <span className="text-slate-300 text-xl [@media(min-width:3200px)]:text-4xl [@media(min-width:4400px)]:text-5xl font-medium cursor-pointer" onClick={logoutHandler}>
           Powered by
         </span>
         <img src={NubitLogo} alt="Nubit" className="h-5 min-[2000px]:h-7 [@media(min-width:3200px)]:h-9 [@media(min-width:4400px)]:h-14 w-auto object-contain cursor-pointer opacity-90" onClick={logoutHandler} />
