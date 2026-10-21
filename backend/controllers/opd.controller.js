@@ -248,6 +248,7 @@ const getDoctorPatientsWithStats = async (req, res) => {
   }
 };
 
+// ------- NEXT PATIENT API with SOCKET { Next Patient Call Api } ------------------
 const getDoctorNextPatient = async (req, res) => {
   let connection;
 
@@ -261,7 +262,7 @@ const getDoctorNextPatient = async (req, res) => {
       treatment,
       medicalPlan,
       medicine,
-    } = req.body;
+    } = req.body || {};
 
     // ================= NORMALIZE STRINGS ONLY =================
     const normalizeString = (val) =>
@@ -405,7 +406,7 @@ const getDoctorNextPatient = async (req, res) => {
   }
 };
 
-// ------- NEXT PATIENT SKIP API with SOCKET { Skip Api } ------------------
+// -------  SKIP PATIENT API with SOCKET { Skip Api } ------------------
 const getDoctorNextPatientSkip = async (req, res) => {
   let connection;
 
