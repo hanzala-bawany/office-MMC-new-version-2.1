@@ -360,7 +360,7 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
                             }}
                             options={docotorPatients?.map(p => ({
                                 value: p.RECEIPTNO,
-                                label: `${p.PATIENTNAME} (Token: ${p.TOKENNO}) - Age: ${p.AGE}, Gender: ${p.GENDER}`,
+                                label: `${p.PATIENTNAME} (Token: ${p.TOKENNO})`,
                                 patient: p
                             }))}
                             optionRender={(option) => (

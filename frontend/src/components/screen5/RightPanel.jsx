@@ -39,7 +39,7 @@ const RightPanel = ({ maList = MEDICAL_ASSISTANT_STATIC, skippedList = SKIPPED_S
           </h2>
         </div>
         <div className="grid px-3 py-1 text-slate-300 font-semibold" style={{ gridTemplateColumns: "1.8fr 0.8fr 2fr", fontSize: "clamp(0.65rem, 0.95vw, 1.3rem)" }}>
-          <span className="pl-7">Room Number</span>
+          <span className="pl-7">Doctor Number</span>
           <span className="text-center">Token No</span>
           <span className="text-center">Room Number</span>
         </div>

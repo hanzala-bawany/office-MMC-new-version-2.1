@@ -3,7 +3,8 @@ require("./database.js");
 const cors = require("cors");
 const path = require("path");
 const { baseDir } = require("./paths.js");
-require("dotenv").config({ path: path.join(baseDir, ".env"), quiet: true });
+const dotenv = require("dotenv")
+dotenv.config({ path: path.join(baseDir, ".env"), quiet: true });
 const http = require("http");
 const { Server } = require("socket.io");
 // Routes

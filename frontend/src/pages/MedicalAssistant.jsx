@@ -206,10 +206,10 @@ const MedicalAssistant = () => {
           </div>
 
           {/* Call panels: mobile par 1 column, lg par 2 columns */}
-          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 w-full max-w-5xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 w-full max-w-5xl">
             <DoctorCallPanel />
             <MyQueuePanel />
-          </div> */}
+          </div>
 
 
         </main>
