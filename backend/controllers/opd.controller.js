@@ -119,7 +119,6 @@ const getTodayDoctorPatients = async (req, res) => {
     await resultSet.close();
 
     res.status(200).json({
-      status: 200,
       count: rows.length,
       data: rows,
     });
@@ -144,8 +143,8 @@ const getTodayDoctorPatients = async (req, res) => {
 const getDoctorPatientsWithStats = async (req, res) => {
   let connection;
   try {
-    const { doctorId } = req.params;
-    const { status } = req.query;
+    const { doctorId } = req.params || {};
+    const { status } = req.query || {};
     const statusFilter = status ? Number(status) : 2;
 
     const pool = await poolPromise;
@@ -173,7 +172,7 @@ const getDoctorPatientsWithStats = async (req, res) => {
       END;
       `,
       {
-        doc_id: doctorId,
+        doc_id: doctorId == "all" ? null : doctorId ,
         status_filter: statusFilter,
         today_total: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
         checked: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
