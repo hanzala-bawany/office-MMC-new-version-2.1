@@ -1,5 +1,5 @@
 // VitalCard.jsx
-const VitalCard = ({ label, currentValue, lastValue, bgColor, borderColor, textColor, subTextColor , unit }) => {
+const VitalCard = ({ label, currentValue, lastValue, bgColor, borderColor, textColor, subTextColor , unit, format }) => {
 
 
     return (
@@ -9,10 +9,10 @@ const VitalCard = ({ label, currentValue, lastValue, bgColor, borderColor, textC
         >
             <span className="text-black font-semibold">{label}</span>
             <div className="font-bold" style={{ color: textColor }}>
-                { currentValue ? `${currentValue} ${unit || ""} ` : "—"}
+                { currentValue ? (format ? format(currentValue) : `${currentValue} ${unit || ""} `) : "—"}
             </div>
             <div className="" style={{ color: subTextColor }}>
-                { lastValue ? `${lastValue} ${unit || ""} (L)` : "—" }
+                { lastValue ? (format ? `${format(lastValue)} (L)` : `${lastValue} ${unit || ""} (L)`) : "—" }
             </div>
         </div>
     );

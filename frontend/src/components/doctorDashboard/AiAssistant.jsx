@@ -11,6 +11,7 @@ import {
     DeleteOutlined,
 } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import { formatHeight } from "../../utills/formatHeight";
 
 const AiAssistant = ({ complaint, primaryDiagnosis, onAddTests, onAddMedicines, onAddMedicinePlan, onAddTreatment, visible, onClose, currentPatient, currentVitals, aiResponse, setAiResponse, aiVitalAlerts, setAiVitalAlerts }) => {
 
@@ -54,7 +55,7 @@ const AiAssistant = ({ complaint, primaryDiagnosis, onAddTests, onAddMedicines, 
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
         if (!apiKey) throw new Error("Gemini API key not found");
 
-        const vitalsText = vitals ? `Blood Pressure: ${vitals.bloodPressure || "N/A"}, Blood Sugar: ${vitals.bloodSugar || "N/A"}, Temperature: ${vitals.temperature || "N/A"}, Pulse: ${vitals.pulse || "N/A"}, Weight: ${vitals.weight || "N/A"}, Height: ${vitals.height || "N/A"}` : "Not available";
+        const vitalsText = vitals ? `Blood Pressure: ${vitals.bloodPressure || "N/A"}, Blood Sugar: ${vitals.bloodSugar || "N/A"}, Temperature: ${vitals.temperature || "N/A"}, Pulse: ${vitals.pulse || "N/A"}, Weight: ${vitals.weight || "N/A"}, Height: ${formatHeight(vitals.height) || "N/A"}` : "Not available";
 
         //         const prompt = `You are a medical assistant for a Pakistani government/private hospital OPD. 
         // Patient info:
@@ -99,7 +100,7 @@ Patient info:
 - Gender: ${currentPatient?.GENDER || "Not provided"}
 - Primary Complain: ${complaintText || "Not provided"}
 - Primary Diagnosis: ${Array.isArray(diagnosisList) ? diagnosisList.join(", ") : diagnosisList || "Not provided"}
-- Vitals: BP ${vitals?.bloodPressure || "N/A"}, Sugar ${vitals?.bloodSugar || "N/A"} mg/dL, Temp ${vitals?.temperature || "N/A"}°F, Pulse ${vitals?.pulse || "N/A"} bpm, Weight ${vitals?.weight || "N/A"} kg, Height ${vitals?.height || "N/A"} cm
+- Vitals: BP ${vitals?.bloodPressure || "N/A"}, Sugar ${vitals?.bloodSugar || "N/A"} mg/dL, Temp ${vitals?.temperature || "N/A"}°F, Pulse ${vitals?.pulse || "N/A"} bpm, Weight ${vitals?.weight || "N/A"} kg, Height ${formatHeight(vitals?.height) || "N/A"}
 
 CRITICAL INSTRUCTIONS FOR YOUR RESPONSE:
 

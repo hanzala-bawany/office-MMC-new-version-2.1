@@ -148,7 +148,7 @@ const AddVitalsModal = ({ isOpen, onClose, currentPatientsVitals, loginUserData,
 
                             <Input
                                 // placeholder={placeholder}
-                                type={formKey === "bloodPressure" ? "text" : "number"}
+                                type={formKey === "bloodPressure" || formKey === "height" ? "text" : "number"}
                                 suffix={<span className="text-xs text-gray-400">{unit}</span>}
                                 value={vitalsForm[formKey]}
                                 onChange={(e) => {
@@ -156,6 +156,11 @@ const AddVitalsModal = ({ isOpen, onClose, currentPatientsVitals, loginUserData,
 
                                     if (formKey === "bloodPressure") {
                                         if (val === "" || /^[\d/]*$/.test(val)) {
+                                            setVitalsForm({ ...vitalsForm, [formKey]: val, })
+                                        }
+                                    } else if (formKey === "height") {
+                                        // feet'inches", e.g. 5'8"
+                                        if (val === "" || /^[\d'"\s.]*$/.test(val)) {
                                             setVitalsForm({ ...vitalsForm, [formKey]: val, })
                                         }
                                     } else {

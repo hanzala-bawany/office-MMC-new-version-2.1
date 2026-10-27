@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { base_URL } from "../../utills/baseUrl";
 import { toast } from "react-toastify";
 import axios from "axios";
+import StationModal from "./StationModal";
+import useStationOnline from "./useStationOnline";
 
 
 // ─── Minimal CSS — only what Tailwind can't do (animations + AntD overrides) ──
@@ -169,6 +171,8 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
 
     // Vitals form state
     const [vitals, setVitals] = useState({});
+    const [stationMode, setStationMode] = useState(null); // null | "combined" | "weight" | "height"
+    const station = useStationOnline(); // { online, weight, height } from the station /health
     const [saved, setSaved] = useState(false);
     const [loading, setLoading] = useState(false);
     const [docotorPatients, setDocotorPatients] = useState([]);
@@ -207,6 +211,12 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
         setVitals(prev => ({ ...prev, [key]: value }));
     };
 
+
+    // values captured from the vitals station go into the form only; saving stays with "Save Vitals"
+    const applyStation = useCallback((patch) => {
+        setSaved(false);
+        setVitals(prev => ({ ...prev, ...patch }));
+    }, []);
 
     const handleReset = () => { setVitals({}); setSaved(false); };
 
@@ -418,6 +428,19 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
                     </span>
                 </div>
 
+                {/* Vitals station: weight + height in one go */}
+                {station.weight && station.height && (
+                    <button
+                        type="button"
+                        onClick={() => setStationMode("combined")}
+                        disabled={!selectedPatient}
+                        className="w-full mb-4 h-12 rounded-2xl border-none text-white text-sm font-semibold cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                        style={{ background: "linear-gradient(135deg, #0e7490 0%, #4f46e5 100%)" }}
+                    >
+                        ⚡ Capture Weight + Height
+                    </button>
+                )}
+
                 {/* Vitals Grid */}
                 <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-3.5 mb-6">
 
@@ -460,9 +483,10 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
 
 
                                     {/* Input */}
-                                    <div className="relative">
+                                    <div className="flex items-center gap-2">
+                                    <div className="relative flex-1">
                                         <Input
-                                            type={v.key === "bloodPressure" ? "text" : "number"}
+                                            type={v.key === "bloodPressure" || v.key === "height" ? "text" : "number"}
                                             placeholder={v.placeholder}
                                             value={vitals[v.key] || ""}
                                             onChange={(e) => {
@@ -470,6 +494,11 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
 
                                                 if (v.key === "bloodPressure") {
                                                     if (val === "" || /^[\d/]*$/.test(val)) {
+                                                        handleVitalChange(v.key, val);
+                                                    }
+                                                } else if (v.key === "height") {
+                                                    // feet'inches", e.g. 5'8" (also allows plain numbers)
+                                                    if (val === "" || /^[\d'"\s.]*$/.test(val)) {
                                                         handleVitalChange(v.key, val);
                                                     }
                                                 } else {
@@ -483,6 +512,18 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
                                                 style={{ color: v.color }}
                                             >✓</span>
                                         )}
+                                    </div>
+                                    {((v.key === "weight" && station.weight) || (v.key === "height" && station.height)) && (
+                                        <button
+                                            type="button"
+                                            disabled={!selectedPatient}
+                                            onClick={() => setStationMode(v.key)}
+                                            className="shrink-0 h-8 px-3 rounded-lg border-none text-white text-xs font-semibold cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                                            style={{ background: "linear-gradient(135deg, #4338ca, #3b82f6)" }}
+                                        >
+                                            ⚡ Capture
+                                        </button>
+                                    )}
                                     </div>
 
 
@@ -528,6 +569,13 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
                 </div>
 
             </div>
+
+            <StationModal
+                mode={stationMode}
+                onClose={() => setStationMode(null)}
+                onApply={applyStation}
+                currentWeight={vitals.weight}
+            />
 
         </>
     )
