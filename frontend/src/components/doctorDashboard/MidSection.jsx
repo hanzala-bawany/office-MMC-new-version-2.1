@@ -15,6 +15,7 @@ import AiAssistant from "./AiAssistant";
 import { BulbOutlined } from "@ant-design/icons";
 import StopModal from "./StopModal";
 import { useNavigate } from "react-router-dom";
+import { formatHeight } from "../../utills/formatHeight";
 
 const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHandlerParent, formData, setFormData }) => {
 
@@ -254,7 +255,8 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
       formKey: "height",
       lastKey: "HEIGHT",
       label: "Height",
-      unit: "cm",
+      unit: "",
+      format: formatHeight,
       bgColor: "#F3F4F6",
       borderColor: "#4B5563",
       textColor: "#374151",
@@ -727,6 +729,7 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                   textColor={vital.textColor}
                   subTextColor={vital.subTextColor}
                   unit={vital.unit}
+                  format={vital.format}
                 />
               ))}
             </div>

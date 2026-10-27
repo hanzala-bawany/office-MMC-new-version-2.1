@@ -19,6 +19,7 @@ import {
 } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useReactToPrint } from 'react-to-print';
+import { formatHeight } from "../utills/formatHeight";
 
 
 
@@ -320,7 +321,7 @@ const PrescriptionReport = () => {
                                             <div className="bg-purple-50 p-3 rounded-lg border border-purple-100 text-center">
                                                 <Text className="text-xs text-purple-600 block">Height</Text>
                                                 <Text className="text-sm font-semibold text-purple-800">
-                                                    {currentPatientData?.HEIGHT || 'N/A'} cm
+                                                    {formatHeight(currentPatientData?.HEIGHT) || 'N/A'}
                                                 </Text>
                                             </div>
                                             <div className="bg-orange-50 p-3 rounded-lg border border-orange-100 text-center">

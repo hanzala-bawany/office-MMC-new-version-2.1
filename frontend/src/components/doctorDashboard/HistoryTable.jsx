@@ -18,6 +18,7 @@ import ReportsLayout from "../../Layouts/ReportsLayout";
 import CBCReport from "../PatientHistory/CBCReport";
 import UrineReport from "../PatientHistory/UrineReport";
 import KidneyFunction from "../PatientHistory/KidneyFunction";
+import { formatHeight } from "../../utills/formatHeight";
 
 
 const { Title, Text } = Typography;
@@ -243,7 +244,7 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
               Height
             </span>
             <span className="font-bold text-gray-700">
-              {selectedHistory?.HEIGHT || "N/A"} ft
+              {formatHeight(selectedHistory?.HEIGHT) || "N/A"}
             </span>
           </div>
 
