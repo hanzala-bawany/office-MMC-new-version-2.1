@@ -38,7 +38,7 @@ const MyQueuePanel = () => {
       setQueue(data.queue ?? []);
       setCurrentPatient(data.current ?? null);
     } catch {
-      toast.error("Queue load nahi hui");
+      // toast.error("Queue load nahi hui");
     }
   };
 
@@ -182,8 +182,10 @@ const MyQueuePanel = () => {
               Skip
             </Button>
           </Popconfirm>
+
         </div>
       </div>
+      
     </section>
   );
 };
