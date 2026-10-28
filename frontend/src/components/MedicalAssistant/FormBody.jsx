@@ -524,7 +524,7 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-3">
             {[
-              { label: "pulse (bpm)", val: m?.spo2?.pulse_rate_bpm || m?.blood_pressure?.nibp?.pulse_rate_bpm },
+              { label: `pulse (${m?.spo2?.pulse_rate_bpm ? "spo2" : m?.blood_pressure?.nibp?.pulse_rate_bpm ? "BP" : "-"})`, val: m?.spo2?.pulse_rate_bpm || m?.blood_pressure?.nibp?.pulse_rate_bpm },
               { label: "SpO₂ %", val: m?.spo2?.spo2_pct },
               { label: "BP mmHg", val: liveBP },
               { label: "Resp /min", val: m?.respiration?.rr_from_ecg_bpm },

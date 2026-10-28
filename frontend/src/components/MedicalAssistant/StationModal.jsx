@@ -54,7 +54,7 @@ const Spin = ({ text }) => (
 const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
     const [phase, setPhase] = useState("setup"); // setup | running | done | partial | failed
     const [capture, setCapture] = useState("manual"); // combined: manual | auto
-    const [hSource, setHSource] = useState("auto"); // height only: auto | photo
+    const [hSource, setHSource] = useState("manual"); // height only: manual | auto | photo
     const [camera, setCamera] = useState(() => localStorage.getItem("vx_camera") || "rtsp");
     const [camUrl, setCamUrl] = useState("");
     const [onScale, setOnScale] = useState(false);
@@ -65,9 +65,13 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
     const [jobId, setJobId] = useState(null);
     const [photoSent, setPhotoSent] = useState(false);
     const [photoErr, setPhotoErr] = useState("");
+    const [skipWeight, setSkipWeight] = useState(false); // combined: weight skipped, only the height is measured
+    const [measuring, setMeasuring] = useState(false);   // a height picture is being measured
 
     const job = useRef(null); // { id, path, timer, busy, bad, t0 }
     const lastW = useRef(null);
+    const imgRef = useRef(null);   // live camera <img> of the height-only view (a picture is taken from it in the browser)
+    const seq = useRef(0);         // a running upload is ignored once the modal is closed
     const modeRef = useRef(mode);
     const onApplyRef = useRef(onApply);
     modeRef.current = mode;
@@ -140,6 +144,7 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
     const startJob = async (path, body) => {
         setPhase("running"); setError(""); setView(null); setResult(null);
         setPhotoSent(false); setPhotoErr(""); setJobId(null); lastW.current = null;
+        setSkipWeight(false); setMeasuring(false);
         try {
             const s = await stationFetch(path, { method: "POST", json: body });
             const j = { id: s.job_id, path, bad: 0, busy: false, t0: Date.now(), timer: null };
@@ -171,6 +176,7 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
                 : startJob(EP.combined, { ...camBody(), include_image: true });
         }
         // height only
+        if (hSource === "manual") { camBody(); setPhotoErr(""); return setPhase("running"); } // live picture + Take photo
         if (hSource === "auto") {
             const w = parseFloat(currentWeight);
             return startJob(EP.heightAuto, { ...camBody(), on_scale: onScale, weight_kg: w > 0 ? w : null, include_image: true });
@@ -178,19 +184,51 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
         return uploadHeight();
     };
 
-    const uploadHeight = async () => {
-        if (!file) return;
-        setPhase("running"); setError(""); setView(null);
+    // Measure the height of a picture (uploaded file, or a picture taken from the live view)
+    const sendHeight = async (img, name = "photo.jpg", scale = onScale) => {
+        const mine = ++seq.current;
+        setPhase("running"); setError(""); setView(null); setPhotoErr(""); setMeasuring(true);
         const fd = new FormData();
-        fd.append("image", file);
-        fd.append("on_scale", String(onScale));
+        fd.append("image", img, name);
+        fd.append("on_scale", String(scale));
         fd.append("include_image", "true");
         const w = parseFloat(currentWeight);
         if (w > 0) fd.append("weight_kg", String(w));
         try {
-            applyDone(await stationFetch(EP.height, { method: "POST", body: fd }), null);
+            const r = await stationFetch(EP.height, { method: "POST", body: fd });
+            if (seq.current !== mine) return; // modal was closed meanwhile
+            setMeasuring(false);
+            applyDone(r, null);
         } catch (e) {
+            if (seq.current !== mine) return;
+            setMeasuring(false);
             fail(e.message);
+        }
+    };
+
+    const uploadHeight = () => (file ? sendHeight(file, file.name || "photo.jpg") : undefined);
+
+    // Picture of the live camera view, taken in the browser
+    const grabFrame = () => new Promise((resolve, reject) => {
+        const img = imgRef.current;
+        if (!img || !img.naturalWidth) { reject(new Error("The live picture is not ready yet")); return; }
+        try {
+            const c = document.createElement("canvas");
+            c.width = img.naturalWidth;
+            c.height = img.naturalHeight;
+            c.getContext("2d").drawImage(img, 0, 0);
+            c.toBlob((b) => (b ? resolve(b) : reject(new Error("Could not read the picture"))), "image/jpeg", 0.92);
+        } catch {
+            reject(new Error("The browser could not read the live picture. Use Upload instead."));
+        }
+    });
+
+    const takeHeightPhoto = async () => {
+        setPhotoErr("");
+        try {
+            sendHeight(await grabFrame(), "photo.jpg", onScale);
+        } catch (e) {
+            setPhotoErr(e.message);
         }
     };
 
@@ -205,19 +243,50 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
         }
     };
 
-    const handleClose = () => { cancelJob(); onClose(); };
+    // The weight did not come: still measure the height (fresh picture from the live view)
+    const heightOnlyFromCombined = () => {
+        cancelJob();            // stop waiting for the scale
+        setOnScale(true);       // in this flow the person stands on the scale (1 inch is subtracted)
+        setPhotoErr(""); setError(""); setView(null); setJobId(null);
+        setSkipWeight(true);
+        setPhase("running");    // live picture + Take photo, no scale job
+    };
+
+    const handleClose = () => { seq.current += 1; cancelJob(); onClose(); };
+
+    // Weight only. If the Smart Life login is already done (no QR needed) there is nothing to set up:
+    // start at once and show "Step on the scale". Otherwise the Start button (and the QR) appear as before.
+    const checkScaleThenStart = async () => {
+        const mine = ++seq.current;
+        setPhase("checking");
+        for (let i = 0; i < 4; i++) {
+            let st = null;
+            try { st = await stationFetch("/weight/status"); } catch { st = null; }
+            if (seq.current !== mine) return;                    // closed or reopened meanwhile
+            if (st?.state === "connected") { startJob(EP.weight, null); return; }
+            if (st?.state !== "connecting") break;               // offline / error / qr_required / unreachable
+            await new Promise((r) => setTimeout(r, 1000));       // scale is still reconnecting, look again
+            if (seq.current !== mine) return;
+        }
+        setPhase("setup");
+    };
+
+    const again = () => (mode === "weight" ? checkScaleThenStart() : setPhase("setup"));
 
     // ── lifecycle ────────────────────────────────────────────────────────────
     useEffect(() => { // fresh state every time the modal opens
         if (!mode) return;
+        seq.current += 1;
         cancelJob();
         setPhase("setup"); setView(null); setResult(null); setError(""); setFile(null);
         setJobId(null); setPhotoSent(false); setPhotoErr(""); setOnScale(false);
+        setSkipWeight(false); setMeasuring(false);
+        if (mode === "weight") checkScaleThenStart();
     }, [mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => { setCamUrl(localStorage.getItem(`vx_cam_${camera}`) || ""); }, [camera]);
 
-    useEffect(() => () => cancelJob(), []); // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => () => { seq.current += 1; cancelJob(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── render helpers ───────────────────────────────────────────────────────
     const cameraPicker = (
@@ -270,24 +339,57 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
         }
         return (
             <>
-                <Seg value={hSource} onChange={setHSource} options={[["auto", "⚡ Automatic"], ["photo", "📷 Photo upload"]]} />
-                {hSource === "auto" ? (
+                <Seg value={hSource} onChange={setHSource} options={[["manual", "📸 Manual photo"], ["auto", "⚡ Automatic"], ["photo", "📷 Upload"]]} />
+                {hSource === "photo" ? (
+                    <input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] || null)} className="text-sm" />
+                ) : (
                     <>
                         {cameraPicker}
-                        <p className="text-xs text-gray-500">The camera window opens on the station PC (green box, countdown).</p>
+                        <p className="text-xs text-gray-500">
+                            {hSource === "manual"
+                                ? "A live camera picture appears here. Tap Take photo when the person stands straight."
+                                : "The camera window opens on the station PC (green box, countdown)."}
+                        </p>
                     </>
-                ) : (
-                    <input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] || null)} className="text-sm" />
                 )}
                 {scaleCheck}
                 <button className={btnGo} onClick={start} disabled={hSource === "photo" && !file}>
-                    {hSource === "auto" ? "Open camera & capture" : "Measure height"}
+                    {hSource === "auto" ? "Open camera & capture" : hSource === "manual" ? "Open camera" : "Measure height"}
                 </button>
             </>
         );
     };
 
+    const renderLive = () => (
+        <>
+            {skipWeight && (
+                <div className="text-xs text-amber-800 bg-amber-50 rounded-lg p-2 mb-2">
+                    Weight skipped. Only the height will be measured.
+                </div>
+            )}
+            <img
+                ref={imgRef} crossOrigin="anonymous" alt="Camera preview"
+                src={previewUrl(camera, camera === "webcam" ? "" : camUrl.trim(), { width: 1920, fps: 8 })}
+                className="w-full rounded-xl bg-black min-h-[120px]"
+            />
+            {skipWeight && scaleCheck}
+            <button className={btnGo} onClick={takeHeightPhoto}>📸 Take photo</button>
+            {photoErr && <div className="mt-2 text-xs text-amber-700 bg-amber-50 rounded-lg p-2">{photoErr}</div>}
+            <button className={btnGhost} onClick={handleClose}>Cancel</button>
+        </>
+    );
+
     const renderRunning = () => {
+        if (measuring) {
+            return (
+                <>
+                    <Spin text="Measuring height…" />
+                    <button className={btnGhost} onClick={handleClose}>Cancel</button>
+                </>
+            );
+        }
+        if (skipWeight || (mode === "height" && hSource === "manual")) return renderLive();
+
         const status = view?.status;
         const w = view?.partial?.weight_kg;
         const step = STEP_OF[status] ?? 0;
@@ -335,6 +437,11 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
                 )}
 
                 <Spin text={text} />
+                {mode === "combined" && w == null && jobId && (
+                    <button className={btnGhost} onClick={heightOnlyFromCombined}>
+                        Weight not working? Measure height only
+                    </button>
+                )}
                 <button className={btnGhost} onClick={handleClose}>Cancel</button>
             </>
         );
@@ -356,14 +463,17 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
                 {mode !== "weight" && ok && r.bmi != null && <div className="text-sm text-gray-600">BMI {num1(r.bmi)}</div>}
                 {!ok && (
                     <div className="text-sm text-amber-800 bg-amber-50 rounded-lg p-3 mt-2">
-                        <b>Height could not be read.</b>{mode === "combined" && " The weight was kept."}
+                        <b>Height could not be read.</b>{mode === "combined" && w != null && " The weight was kept."}
                         <div>{(r.reject_reasons || []).join(" ")}</div>
                     </div>
+                )}
+                {mode === "combined" && w == null && (
+                    <div className="text-xs text-amber-700 mt-1">Weight was not measured. Enter it by hand or use Capture weight.</div>
                 )}
                 <p className="text-xs text-gray-400 mt-2">Added to the form. It is saved only when you press Save Vitals.</p>
                 {img && <img src={img} alt="Annotated measurement" className="w-full rounded-xl mt-2" />}
                 <button className={btnGo} onClick={handleClose}>Done</button>
-                <button className={btnGhost} onClick={() => setPhase("setup")}>{ok ? "Retake" : "Try again"}</button>
+                <button className={btnGhost} onClick={again}>{ok ? "Retake" : "Try again"}</button>
             </>
         );
     };
@@ -371,7 +481,12 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
     const renderFailed = () => (
         <>
             <div className="text-sm text-red-700 bg-red-50 rounded-lg p-3">{error}</div>
-            <button className={btnGo} onClick={() => setPhase("setup")}>Try again</button>
+            {mode === "combined" && !/cannot reach/i.test(error) && (
+                <button className={btnGo} onClick={heightOnlyFromCombined}>
+                    Measure height only
+                </button>
+            )}
+            <button className={mode === "combined" && !/cannot reach/i.test(error) ? btnGhost : btnGo} onClick={again}>Try again</button>
             <button className={btnGhost} onClick={handleClose}>Close</button>
         </>
     );
@@ -389,6 +504,12 @@ const StationModal = ({ mode, onClose, onApply, currentWeight }) => {
         >
             {mode && (
                 <div>
+                    {phase === "checking" && (
+                        <>
+                            <Spin text="Checking the scale…" />
+                            <button className={btnGhost} onClick={handleClose}>Cancel</button>
+                        </>
+                    )}
                     {phase === "setup" && renderSetup()}
                     {phase === "running" && renderRunning()}
                     {(phase === "done" || phase === "partial") && renderResult()}
