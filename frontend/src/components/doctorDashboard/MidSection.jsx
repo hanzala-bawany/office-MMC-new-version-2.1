@@ -17,8 +17,14 @@ import StopModal from "./StopModal";
 import { useNavigate } from "react-router-dom";
 import { formatHeight } from "../../utills/formatHeight";
 
-const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHandlerParent, formData, setFormData }) => {
-
+const MidSection = ({
+  patientsData,
+  docPatientData,
+  lastVisit,
+  specificCallingHandlerParent,
+  formData,
+  setFormData,
+}) => {
   const loginUserData = JSON.parse(localStorage.getItem("loginUserData"));
   const currentPatientsData = patientsData?.patients?.[0];
   const currentPatientsVitals = patientsData?.patientVitals?.[0];
@@ -32,7 +38,9 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
   let patientToken = Number(specificSearchingToken?.split(" ")[0]);
   const hasAppointments = patientsData?.todayAppointments > 0;
   const hasCurrentPatient = !!currentPatientsData?.RECEIPTNO;
-  const allPatientsDone = patientsData?.todayAppointments === patientsData?.patientsChecked + patientsData?.patientsSkipped;
+  const allPatientsDone =
+    patientsData?.todayAppointments ===
+    patientsData?.patientsChecked + patientsData?.patientsSkipped;
   // const disableNext = isNextLoading || !hasAppointments || (!specificSearchingToken && allPatientsDone);
   // const disableSkip = isSkipLoading || !hasCurrentPatient;
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -40,24 +48,22 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
   const [activeVoiceField, setActiveVoiceField] = useState(null);
   const [isVitalsModalOpen, setIsVitalsModalOpen] = useState(false);
   const [voiceMode, setVoiceMode] = useState("offline");
-  const [showAIAssistant, setShowAIAssistant] = useState(false); // for AI 
+  const [showAIAssistant, setShowAIAssistant] = useState(false); // for AI
   const [aiResponse, setAiResponse] = useState(null);
   const [aiVitalAlerts, setAiVitalAlerts] = useState([]);
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
-  const isFakePatientActive = currentPatientsData?.GENDER == "message"
+  const isFakePatientActive = currentPatientsData?.GENDER == "message";
   const [isOnBreak, setIsOnBreak] = useState(false);
 
   const [cooldown, setCooldown] = useState(0); // 0 matlab timer nahi chal raha
   const cooldownRef = useRef(null);
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
 
   const startBreak = () => {
     setIsOnBreak(true);
   };
 
   const resumeManually = async () => {
-
     try {
       setIsResumeLoading(true);
       const res = await axios.post(`${base_URL}/api/opd/doctor-resume-break`, {
@@ -65,18 +71,14 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
       });
       console.log(res, "res of resume Manually by id");
 
-
       toast.success(`Now you can call patients`);
-      setIsOnBreak(false);   // chahe API fail ho ya pass, UI unlock karo
-
+      setIsOnBreak(false); // chahe API fail ho ya pass, UI unlock karo
     } catch (err) {
       console.log(err, "error in next Handler");
       toast.error(err?.message);
+    } finally {
+      setIsResumeLoading(false);
     }
-    finally {
-      setIsResumeLoading(false)
-    }
-
   };
 
   const startCooldown = () => {
@@ -98,15 +100,23 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
     return () => clearInterval(cooldownRef.current); // cleanup
   }, []);
 
-
-
-  const disableNext = isNextLoading || !hasAppointments || (!specificSearchingToken && allPatientsDone) || isOnBreak || isCoolingDown;        // ← break pe sab band
-  const disableSkip = isSkipLoading || !hasCurrentPatient || isOnBreak || isFakePatientActive || isCoolingDown;
-  const disableRepeatCall = !currentPatientsData || isOnBreak || isFakePatientActive || isCoolingDown;
-  const disableAddVitals = !currentPatientsData || isOnBreak || isFakePatientActive;
-  const currentFaculty = loginUserData?.faculty ||"Physician"; 
-
-
+  const disableNext =
+    isNextLoading ||
+    !hasAppointments ||
+    (!specificSearchingToken && allPatientsDone) ||
+    isOnBreak ||
+    isCoolingDown; // ← break pe sab band
+  const disableSkip =
+    isSkipLoading ||
+    !hasCurrentPatient ||
+    isOnBreak ||
+    isFakePatientActive ||
+    isCoolingDown;
+  const disableRepeatCall =
+    !currentPatientsData || isOnBreak || isFakePatientActive || isCoolingDown;
+  const disableAddVitals =
+    !currentPatientsData || isOnBreak || isFakePatientActive;
+  const currentFaculty = loginUserData?.faculty || "Physician";
 
   // let patintsW8ing;
 
@@ -118,103 +128,8 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
   // console.log(lastVisit, "<<<<<<<  lastVisit ");
   // console.log(patientToken, "<<<<<<<  patientToken ");
 
-  // Sample departments data - sirf UI dikhane ke liye
-  const departments = [
-    { id: "1", name: "General", type: "1" },
-    { id: "2", name: "BIOCHEMISTRY", type: "2" },
-    { id: "3", name: "HEAMOTOLOGY", type: "2" },
-    { id: "4", name: "SEROLOGY", type: "2" },
-    { id: "5", name: "HORMONES", type: "2" },
-    { id: "6", name: "URINE EXAMINATION", type: "2" },
-    { id: "7", name: "BLOOD BANK", type: "2" },
-    { id: "8", name: "FLUIDS", type: "2" },
-    { id: "9", name: "MICROBIOLOGY", type: "2" },
-    { id: "10", name: "STOOL EXAMINATION", type: "2" },
-    { id: "11", name: "SEMEN ANALYSIS", type: "2" },
-    { id: "12", name: "HEPATITIS", type: "2" },
-    { id: "14", name: "HISTROPATHOLOGY", type: "2" },
-    { id: "15", name: "ECHOCARDIOGRAPHY", type: "19" },
-    { id: "16", name: "SPECIAL CHEMISTRY-1", type: "2" },
-    { id: "17", name: "SPECIAL CHEMISTRY-2", type: "2" },
-  ];
 
-  // Sample tests data - sirf UI dikhane ke liye
-  const sampleTests = [
-    { id: "101", name: "Complete Blood Count", department: "2" },
-    { id: "102", name: "Blood Sugar Fasting", department: "2" },
-    { id: "103", name: "Lipid Profile", department: "2" },
-    { id: "104", name: "Liver Function Test", department: "2" },
-    { id: "105", name: "Thyroid Profile", department: "5" },
-    { id: "106", name: "Urine Routine", department: "6" },
-  ];
 
-  // Sample lab patients data - sirf UI dikhane ke liye
-  const sampleLabPatients = [
-    {
-      id: 1,
-      patientName: "Ahmed Khan",
-      tokenNo: "T-101",
-      testName: "Complete Blood Count",
-      department: "HEAMOTOLOGY",
-      status: "pending",
-    },
-    {
-      id: 2,
-      patientName: "Fatima Ali",
-      tokenNo: "T-102",
-      testName: "Blood Sugar Fasting",
-      department: "BIOCHEMISTRY",
-      status: "in progress",
-    },
-    {
-      id: 3,
-      patientName: "Usman Tariq",
-      tokenNo: "T-103",
-      testName: "Lipid Profile",
-      department: "BIOCHEMISTRY",
-      status: "completed",
-    },
-    {
-      id: 4,
-      patientName: "Ayesha Malik",
-      tokenNo: "T-104",
-      testName: "Thyroid Profile",
-      department: "HORMONES",
-      status: "pending",
-    },
-    {
-      id: 5,
-      patientName: "Bilal Ahmed",
-      tokenNo: "T-105",
-      testName: "Urine Routine",
-      department: "URINE EXAMINATION",
-      status: "in progress",
-    },
-    {
-      id: 6,
-      patientName: "Hassan Raza",
-      tokenNo: "T-106",
-      testName: "Liver Function Test",
-      department: "BIOCHEMISTRY",
-      status: "completed",
-    },
-    {
-      id: 7,
-      patientName: "Sara Khan",
-      tokenNo: "T-107",
-      testName: "Hepatitis Screening",
-      department: "HEPATITIS",
-      status: "pending",
-    },
-    {
-      id: 8,
-      patientName: "Ali Hamza",
-      tokenNo: "T-108",
-      testName: "Stool Routine",
-      department: "STOOL EXAMINATION",
-      status: "pending",
-    },
-  ];
 
   const VITALS_CONFIG = [
     {
@@ -284,6 +199,17 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
       textColor: "#B45309",
       subTextColor: "#92400E",
     },
+    {
+      currentKey: "CSPO2",
+      formKey: "spo2",
+      lastKey: "SPO2",
+      label: "SpO₂",
+      unit: "%",
+      bgColor: "#ECFEFF",
+      borderColor: "#06B6D4",
+      textColor: "#0E7490",
+      subTextColor: "#155E75",
+    },
   ];
 
   const pieData = [
@@ -299,30 +225,7 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
     }, // purple-500
   ];
 
-  const patientData = {
-    name: "Ali Raza",
-    age: 32,
-    gender: "Male",
-    opdId: "A - 20",
 
-    CbloodPressure: "120/80 mmHg",
-    LbloodPressure: "130/85 mmHg",
-
-    CbloodSugar: "95 mg/dL",
-    LbloodSugar: "105 mg/dL",
-
-    Cweight: "72 kg",
-    Lweight: "74 kg",
-
-    Cheight: "5.8 ft",
-    Lheight: "5.8 ft",
-
-    Ctemperature: "98.4°F",
-    Ltemperature: "99.1°F",
-
-    Cpulse: "78 bpm",
-    Lpulse: "82 bpm",
-  };
 
   const diagnosisOptions = patientsData?.diagnosisList?.map((item) => ({
     value: item.DIAGNOSIS,
@@ -334,47 +237,68 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
     label: item?.TEST_NAME,
   }));
 
-  const skippedTokenListOptions = patientsData?.skippedTokenList?.map((item) => ({
-    value: item?.TOKENNO,
-    label: `${item?.TOKENNO} | ${item?.PATIENTNAME}`,
-    // Multi-line display for dropdown
-    labelWithBreaks: (
-      <div className="py-2 px-1 border-b border-gray-100 last:border-b-0">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800">
-            Token: {item?.TOKENNO}
-          </span>
-          <span className="font-medium text-gray-800 text-sm">
-            {item?.PATIENTNAME}
-          </span>
-        </div>
-        <div className="flex gap-4 text-xs text-gray-600">
-          <span className="inline-flex items-center gap-1">
-            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="font-medium">Gender:</span> {item?.GENDER || 'N/A'}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="font-medium">Age:</span> {item?.AGE || 'N/A'} {item?.AGE && 'yrs'}
-          </span>
-        </div>
-      </div>
-    )
-  }));
-
-  const medicinesOptions = patientsData?.medicineList?.map(
+  const skippedTokenListOptions = patientsData?.skippedTokenList?.map(
     (item) => ({
-      value: item?.MEDICINE_NAME,
-      label: item?.MEDICINE_NAME,
+      value: item?.TOKENNO,
+      label: `${item?.TOKENNO} | ${item?.PATIENTNAME}`,
+      // Multi-line display for dropdown
+      labelWithBreaks: (
+        <div className="py-2 px-1 border-b border-gray-100 last:border-b-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800">
+              Token: {item?.TOKENNO}
+            </span>
+            <span className="font-medium text-gray-800 text-sm">
+              {item?.PATIENTNAME}
+            </span>
+          </div>
+          <div className="flex gap-4 text-xs text-gray-600">
+            <span className="inline-flex items-center gap-1">
+              <svg
+                className="w-3.5 h-3.5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+              <span className="font-medium">Gender:</span>{" "}
+              {item?.GENDER || "N/A"}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <svg
+                className="w-3.5 h-3.5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="font-medium">Age:</span> {item?.AGE || "N/A"}{" "}
+              {item?.AGE && "yrs"}
+            </span>
+          </div>
+        </div>
+      ),
     }),
   );
 
-  const nextHandler = async () => {
+  const medicinesOptions = patientsData?.medicineList?.map((item) => ({
+    value: item?.MEDICINE_NAME,
+    label: item?.MEDICINE_NAME,
+  }));
 
+  const nextHandler = async () => {
     try {
       setIsNextLoading(true);
       const res = await axios.post(`${base_URL}/api/opd/doctor/next-patient`, {
@@ -413,19 +337,14 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
   };
 
   const specificCallingHandler = async () => {
-
     try {
-
       setIsNextLoading(true);
       await specificCallingHandlerParent(patientToken);
       setSpecificSearchingToken(null);
       startCooldown();
-
     } catch (err) {
-
       console.log(err, "error in specific Calling Handler");
       toast.error(err?.message);
-
     } finally {
       setIsNextLoading(false);
     }
@@ -506,7 +425,9 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
     const currentMedicines = formData.medicines || [];
     const newMedicines = [...new Set([...currentMedicines, ...medicinesList])];
     formHandler("medicines", newMedicines);
-    toast.success(`${medicinesList.length} medicine(s) added to Medicines list`);
+    toast.success(
+      `${medicinesList.length} medicine(s) added to Medicines list`,
+    );
   };
 
   // Handle medicine plan from AI (for Medicine Plan textarea)
@@ -520,62 +441,57 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
   };
 
   const BreakBtn = () => {
-
-    return <Button
-      onClick={isOnBreak ? resumeManually : () => setIsStopModalOpen(true)}
-      style={{
-        // width: "15%",
-        borderColor: isOnBreak ? "#16a34a" : "#ef4444",
-        color: isOnBreak ? "#16a34a" : "#ef4444",
-      }}
-      block
-      loading={isResumeLoading}
-      className={
-        isOnBreak
-          ? "hover:border-green-600! hover:text-green-600! hover:bg-green-50! active:bg-green-100! transition-all duration-200"
-          : `hover:border-red-600! hover:text-red-600! hover:bg-red-50! active:bg-red-100! transition-all duration-200 `
-      }
-    >
-      {isOnBreak ? `▶ Resume` : "BREAK"}
-    </Button>
-  }
+    return (
+      <Button
+        onClick={isOnBreak ? resumeManually : () => setIsStopModalOpen(true)}
+        style={{
+          // width: "15%",
+          borderColor: isOnBreak ? "#16a34a" : "#ef4444",
+          color: isOnBreak ? "#16a34a" : "#ef4444",
+        }}
+        block
+        loading={isResumeLoading}
+        className={
+          isOnBreak
+            ? "hover:border-green-600! hover:text-green-600! hover:bg-green-50! active:bg-green-100! transition-all duration-200"
+            : `hover:border-red-600! hover:text-red-600! hover:bg-red-50! active:bg-red-100! transition-all duration-200 `
+        }
+      >
+        {isOnBreak ? `▶ Resume` : "BREAK"}
+      </Button>
+    );
+  };
 
   const PrintBtn = () => {
-
-    
-
     return (
-
       <button
         onClick={handlePrintReport}
         disabled={!patientsData?.patients?.[0]}
         className={`
           flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium
           transition-all duration-200 ease-in-out m-2 mx-4
-          ${patientsData?.patients?.[0]
-            ? 'border border-blue-600 text-blue-600 hover:bg-blue-50 hover:shadow-lg active:scale-95 cursor-pointer'
-            : 'border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+          ${
+            patientsData?.patients?.[0]
+              ? "border border-blue-600 text-blue-600 hover:bg-blue-50 hover:shadow-lg active:scale-95 cursor-pointer"
+              : "border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
           }
           w-auto  
       `}
       >
         print / Preview
       </button>
-    )
-
-  }
-
+    );
+  };
 
   const handlePrintReport = () => {
-
     // Check if patient data exists
     if (!patientsData?.patients?.[0]) {
-      toast.warning('No patient data available to print');
+      toast.warning("No patient data available to print");
       return;
     }
 
     if (!formData?.treatment) {
-      toast.warning('Treatment is required');
+      toast.warning("Treatment is required");
       return;
     }
 
@@ -584,21 +500,16 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
       vitals: patientsData?.patientVitals?.[0],
       formData: formData,
       doctorData: loginUserData,
-      lastVisit: lastVisit
+      lastVisit: lastVisit,
     };
 
-    navigate('/prescriptionReport' , {
-      state : { reportData : reportData }
+    navigate("/prescriptionReport", {
+      state: { reportData: reportData },
     });
-    
   };
 
-
-
   return (
-
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-6 2xl:grid-cols-2 mb-8 h-auto xl:grid-rows-1">
-
       {/* Pie Chart - sirf xl/laptop pe */}
       <div className="hidden xl:flex 2xl:hidden order-3 xl:order-3 themeBoxShadow border-none outline-none rounded-[10px] z-10 bg-white flex-col justify-between min-h-40">
         <div className="flex-1 p-2 px-4 sm:p-4 flex justify-between gap-4 sm:gap-8 items-center border-b border-gray-300 text-[18px] text-gray-500 font-medium">
@@ -638,13 +549,11 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
 
       {/* ADD Patient Detail & Patient Vitals */}
       <div className="z-10 rounded-t-[12px] order-1  2xl:contents xl:row-span-2 relative">
-
         {/* Patient Vitals */}
         <div
           id="vitals-section"
           className="flex-1 z-10 themeBoxShadow rounded-t-[12px] bg-white flex flex-col justify-between transition-all duration-300 hover:shadow-lg 2xl:order-2"
         >
-
           <div className="flex-1  p-6 xl:p-4 flex items-center justify-between rounded-t-[12px] border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-blue-500 2xl:bg-none 2xl:from-transparent 2xl:to-transparent">
             <h2 className="flex flex-col gap-2 text-lg sm:text-xl font-semibold text-white 2xl:text-black">
               Patient Vitals
@@ -682,37 +591,38 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                   🔁 Repeat Call
                 </Button>
               </div>
-
             </div>
-
           </div>
 
           <div className="p-6 flex-6 flex flex-col gap-3 text-gray-700 ">
-
             <p>
               <span className="font-semibold text-gray-800">Added by :</span>{" "}
-              {!isFakePatientActive ? currentPatientsVitals?.CREATED_BY || "Not Yet" : "Not Yet"}
+              {!isFakePatientActive
+                ? currentPatientsVitals?.CREATED_BY || "Not Yet"
+                : "Not Yet"}
             </p>
 
             <p>
               <span className="font-semibold text-gray-800">Name :</span>{" "}
-              {!isFakePatientActive ? currentPatientsData?.PATIENTNAME || "Not Yet" : "Not Yet"}
+              {!isFakePatientActive
+                ? currentPatientsData?.PATIENTNAME || "Not Yet"
+                : "Not Yet"}
             </p>
 
             <div className="font-semibold  py-1 flex justify-between text-gray-600">
-
               <p>
                 <span className="font-semibold text-gray-800">Age :</span>{" "}
-                {!isFakePatientActive ? currentPatientsData?.AGE || "Not Yet" : "Not Yet"}
+                {!isFakePatientActive
+                  ? currentPatientsData?.AGE || "Not Yet"
+                  : "Not Yet"}
               </p>
               <p>
                 <span className="font-semibold text-gray-800">Gender :</span>{" "}
-                {!isFakePatientActive ? currentPatientsData?.GENDER || "Not Yet" : "Not Yet"}
+                {!isFakePatientActive
+                  ? currentPatientsData?.GENDER || "Not Yet"
+                  : "Not Yet"}
               </p>
-
             </div>
-
-
 
             <div className="mt-3 grid grid-cols-2  sm:grid-cols-3 gap-3 gap-x-5 text-sm p-4 rounded-2xl shadow-lg transition-all themeBoxShadow">
               {VITALS_CONFIG?.map((vital) => (
@@ -733,7 +643,6 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                 />
               ))}
             </div>
-
           </div>
 
           {/* NEXT BUTTON */}
@@ -766,9 +675,7 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                   : "START"}
             </Button>
 
-
             <BreakBtn desktop={true} />
-
           </div>
 
           {/* Skip Buttons */}
@@ -783,12 +690,10 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
               Skip Patient
             </Button>
           </div>
-
         </div>
 
         {/* Add Patient Detail */}
         <div className="flex-1 z-10 themeBoxShadow border-none outline-none rounded-b-[12px] rounded-t-none 2xl:rounded-xl overflow-hidden bg-white flex flex-col 2xl:order-3">
-
           <div className="p-4 flex-1 flex justify-between items-center 2xl:bg-gradient-to-r 2xl:from-indigo-600 2xl:to-blue-500">
             <div>
               <h2 className="text-lg sm:text-xl font-semibold text-black md:text-black xl:text-black 2xl:text-white">
@@ -802,16 +707,15 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
             <div className="flex items-center gap-3">
               {/* Voice Mode Toggle */}
               <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1 border border-gray-200">
-
-
                 <button
                   type="button"
                   onClick={() => setVoiceMode("offline")}
                   className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200
-          ${voiceMode === "offline"
-                      ? "bg-white text-gray-700 shadow-sm border border-gray-200"
-                      : "text-gray-400 hover:text-gray-600"
-                    }`}
+          ${
+            voiceMode === "offline"
+              ? "bg-white text-gray-700 shadow-sm border border-gray-200"
+              : "text-gray-400 hover:text-gray-600"
+          }`}
                 >
                   <svg
                     width="10"
@@ -846,7 +750,6 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                   </span>
                   Online
                 </button>
-
               </div>
 
               {/* OPD Badge */}
@@ -860,15 +763,12 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                 </span>
               </div>
             </div>
-
           </div>
 
           {/* BODY */}
           <div className="flex-6 grid grid-cols-1  md:grid-cols-2  2xl:grid-cols-2  gap-5 p-4 ">
-
             {/* PRIMARY DIAGNOSIS */}
             <div id="form-primary-diagnosis" className="flex flex-col gap-1">
-
               <label className="text-sm font-medium text-gray-500">
                 Primary Diagnosis
               </label>
@@ -884,7 +784,6 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                 onChange={(value) => formHandler("primaryDiagnosis", value)}
                 value={formData.primaryDiagnosis}
               />
-
             </div>
 
             {/* MEDICAL TESTS */}
@@ -948,7 +847,6 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
               </>
             )}
 
-
             {/*  MEDICINE SELECT (Dropdown) */}
             <div id="form-medicines" className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-500">
@@ -961,10 +859,9 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                 placeholder="Select or type medicine name"
                 optionFilterProp="label"
                 style={{ width: "100%" }}
-                options={medicinesOptions}  // You need to create this from API
+                options={medicinesOptions} // You need to create this from API
                 onChange={(value) => formHandler("medicines", value)}
                 value={formData.medicines}
-
               />
             </div>
 
@@ -991,37 +888,33 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
               />
             )}
 
-
-
             {/* AI Suggestion Button - Professional Floating Button */}
-            {
-              (formData.primaryDiagnosis?.length > 0 || (formData.primaryComplain && formData.primaryComplain.trim() !== "")) && (
-                <Button
-                  type="primary"
-                  icon={<BulbOutlined />}
-                  onClick={() => setShowAIAssistant(true)}
-                  className="fixed! top-10 z-500 right-10 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-4 py-2 bg-linear-to-r from-purple-500 to-indigo-500 border-none text-white font-medium"
-                  style={{
-                    borderRadius: "16px",
-                    transform: "translateY(-50%)",
-                    padding: "10px 24px",
-                    background: "linear-gradient(120deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)"
-                  }}
+            {(formData.primaryDiagnosis?.length > 0 ||
+              (formData.primaryComplain &&
+                formData.primaryComplain.trim() !== "")) && (
+              <Button
+                type="primary"
+                icon={<BulbOutlined />}
+                onClick={() => setShowAIAssistant(true)}
+                className="fixed! top-10 z-500 right-10 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-4 py-2 bg-linear-to-r from-purple-500 to-indigo-500 border-none text-white font-medium"
+                style={{
+                  borderRadius: "16px",
+                  transform: "translateY(-50%)",
+                  padding: "10px 24px",
+                  background:
+                    "linear-gradient(120deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                }}
                 // disabled={!(formData.primaryDiagnosis?.length > 0 || (formData.primaryComplain && formData.primaryComplain.trim() !== ""))}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="hidden sm:inline">AI Suggestion</span>
-                    <span className="sm:hidden">AI</span>
-                  </div>
-                </Button>
-              )
-            }
-
-
-
+              >
+                <div className="flex items-center gap-2">
+                  <span className="hidden sm:inline">AI Suggestion</span>
+                  <span className="sm:hidden">AI</span>
+                </div>
+              </Button>
+            )}
           </div>
 
           {/* <GetVoice formHandler={formHandler} resetTrigger={resetTrigger} /> */}
@@ -1029,7 +922,6 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
 
           {/* NEXT BUTTON */}
           <div className="p-4 border-t border-gray-200 flex items-center gap-4 2xl:hidden">
-
             {/* TOKEN SELECT */}
             <div id="dropdown-select-token" className="flex-1">
               <Select
@@ -1043,18 +935,21 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                 value={specificSearchingToken}
                 optionLabelProp="label"
                 dropdownStyle={{
-                  minWidth: '300px',
-                  width: 'auto',
-                  maxWidth: '90vw',
-                  position: 'fixed'
+                  minWidth: "300px",
+                  width: "auto",
+                  maxWidth: "90vw",
+                  position: "fixed",
                 }}
                 popupRender={(menu) => (
                   <div className="custom-select-dropdown max-h-96 overflow-y-auto">
                     {skippedTokenListOptions?.map((option) => (
                       <div
                         key={option.value}
-                        className={`px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-150 ${specificSearchingToken === option.value ? 'bg-blue-50' : ''
-                          }`}
+                        className={`px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-150 ${
+                          specificSearchingToken === option.value
+                            ? "bg-blue-50"
+                            : ""
+                        }`}
                         onClick={() => {
                           setSpecificSearchingToken(option.value);
                           // If you need to close dropdown, you might need to use Select's ref
@@ -1099,11 +994,9 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
                 Skip Patient
               </Button>
             </div>
-
           </div>
 
           <div className="flex items-center p-4 gap-4">
-
             <div
               id="btn-skip"
               className="border-t border-gray-200 gap-4 flex md:hidden"
@@ -1117,17 +1010,14 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
               >
                 Skip Patient
               </Button>
-
             </div>
 
             <div className="flex w-full 2xl:hidden gap-5">
               <BreakBtn desktop={false} />
             </div>
-
           </div>
 
           <PrintBtn />
-
         </div>
 
         {isCoolingDown && (
@@ -1138,7 +1028,6 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
             </span>
           </div>
         )}
-
       </div>
 
       {/* ADD VITALS MODAL */}
@@ -1162,7 +1051,6 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
         setFormData={setFormData}
         docPatientData={docPatientData}
       />
-
 
       {/* AiAssistant component ko is tarah call karo: */}
       <AiAssistant
@@ -1196,11 +1084,8 @@ const MidSection = ({ patientsData, docPatientData, lastVisit, specificCallingHa
         onAddTreatment={handleAddTreatmentFromAI}
         faculty={currentFaculty}
       />
-
     </div>
-
   );
-
 };
 
 export default memo(MidSection);
