@@ -18,6 +18,7 @@ const AddVitalsModal = ({ isOpen, onClose, currentPatientsVitals, loginUserData,
         height: "",
         temperature: "",
         pulse: "",
+        spo2: "",
     });
 
 
@@ -33,6 +34,7 @@ const AddVitalsModal = ({ isOpen, onClose, currentPatientsVitals, loginUserData,
                 height: vitalsForm?.height || null,
                 temperature: vitalsForm?.temperature || null,
                 pulse: vitalsForm?.pulse || null,
+                spo2: vitalsForm?.spo2 || null,
                 createdBy: loginUserData?.name || null
             });
             // console.log(res, "res of save vital Handler by id");
@@ -42,6 +44,7 @@ const AddVitalsModal = ({ isOpen, onClose, currentPatientsVitals, loginUserData,
             // setSaved(true);
             // setVitals({});
             await docPatientData();
+            handleClose()
             toast.success(`Vitals saved successfully!`);
 
         }
@@ -70,6 +73,7 @@ const AddVitalsModal = ({ isOpen, onClose, currentPatientsVitals, loginUserData,
             height: currentPatientsVitals?.CHEIGHT || "",
             temperature: currentPatientsVitals?.CTEMPERATURE || "",
             pulse: currentPatientsVitals?.CPULSE || "",
+            spo2: currentPatientsVitals?.CSPO2 || "",
         });
 
     }, [currentPatientsVitals]);

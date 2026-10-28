@@ -1,4 +1,4 @@
-import { STATION_URL, STATION_API_KEY } from "../../utills/stationConfig";
+import { STATION_URL, STATION_API_KEY } from "../../utills/baseUrl";
 
 export { STATION_URL };
 

@@ -946,6 +946,7 @@ const addPatientVitals = async (req, res) => {
       height,
       temperature,
       pulse,
+      spo2,
       createdBy,
     } = req.body;
 
@@ -959,6 +960,7 @@ const addPatientVitals = async (req, res) => {
     const p_height = normalize(height);
     const p_temperature = normalize(temperature);
     const p_pulse = normalize(pulse);
+    const p_spo2 = normalize(spo2);
     const p_created_by = normalize(createdBy);
 
     if (!p_receiptno) {
@@ -983,6 +985,7 @@ const addPatientVitals = async (req, res) => {
           p_height         => :height,
           p_temperature    => :temperature,
           p_pulse          => :pulse,
+          p_spo2          => :spo2,
           p_created_by     => :createdBy,
           p_action         => :action
         );
@@ -996,6 +999,7 @@ const addPatientVitals = async (req, res) => {
         height: p_height,
         temperature: p_temperature,
         pulse: p_pulse,
+        spo2: p_spo2,
         createdBy: p_created_by,
         action: { dir: oracledb.BIND_OUT, type: oracledb.STRING },
       },

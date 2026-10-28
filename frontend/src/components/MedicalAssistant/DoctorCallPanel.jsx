@@ -196,8 +196,9 @@ const DoctorCallPanel = () => {
 
       {/* Body */}
       <div className="p-4 sm:p-5">
+
         <div className="flex flex-col gap-3 mb-5 p-4 bg-white rounded-2xl border border-emerald-200 shadow-sm">
-          
+
           {/* Doctor */}
           <Select
             size="large"
@@ -304,8 +305,10 @@ const DoctorCallPanel = () => {
               Skip
             </Button>
           </Popconfirm>
+
         </div>
       </div>
+      
     </section>
   );
 };
