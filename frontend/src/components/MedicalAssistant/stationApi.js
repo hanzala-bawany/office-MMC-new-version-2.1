@@ -44,9 +44,11 @@ export async function stationFetch(path, { method = "GET", json, body, signal } 
 // <img> cannot send headers, so the key goes in the query string.
 const keyQuery = () => (STATION_API_KEY ? `key=${encodeURIComponent(STATION_API_KEY)}&api_key=${encodeURIComponent(STATION_API_KEY)}` : "");
 
-export const previewUrl = (camera, url) =>
+export const previewUrl = (camera, url, { width, fps } = {}) =>
     `${STATION_URL}/camera/preview?camera=${encodeURIComponent(camera)}` +
     (url ? `&url=${encodeURIComponent(url)}` : "") +
+    (width ? `&width=${width}` : "") +
+    (fps ? `&fps=${fps}` : "") +
     (STATION_API_KEY ? `&${keyQuery()}` : "");
 
 export const resultImage = (r) =>
