@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Modal } from "antd";
+import { Modal, Tabs } from "antd";
 import {
   LogoutOutlined,
   CloseOutlined,
@@ -110,7 +110,6 @@ const MedicalAssistant = () => {
           backgroundImage: `radial-gradient(ellipse 80% 50% at 20% -10%, rgba(99,102,241,0.15) 0%, transparent 60%),radial-gradient(ellipse 60% 40% at 80% 110%, rgba(59,130,246,0.12) 0%, transparent 60%)`,
         }}
       >
-
         {/* HEADER */}
         <header className="flex-1 flex flex-wrap items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-4 [@media(min-width:3200px)]:gap-8 [@media(min-width:4400px)]:gap-12">
@@ -187,31 +186,50 @@ const MedicalAssistant = () => {
         </header>
 
         {/* BODY */}
-        <main className="flex-8 flex flex-col  items-center gap-6 w-full">
+  
+        <main className="flex-8 flex flex-col items-center w-full">
+          <div className="w-full max-w-5xl ">
+            <Tabs
+              defaultActiveKey="form"
+              centered
+              size="large"
+              destroyOnHidden ={false}
+              className="medical-tabs"
+              items={[
+                {
+                  key: "form",
+                  label: "🩺 Vitals Form",
+                  children: (
+                    <div
+                      className="anim-fadeUp w-full max-w-2xl mx-auto h-max bg-white/97 rounded-3xl overflow-hidden border border-indigo-200/70"
+                      style={{
+                        boxShadow:
+                          "0 12px 48px rgba(79,70,229,0.13), 0 2px 8px rgba(0,0,0,0.04)",
+                      }}
+                    >
+                      <FormHeader selectedPatient={selectedPatient} />
+                      <FormBody
+                        username={loginUserData?.username}
+                        selectedPatient={selectedPatient}
+                        setSelectedPatient={setSelectedPatient}
+                      />
+                    </div>
+                  ),
+                },
+                {
+                  key: "calls",
+                  label: "📢 Doctor Calls",
+                  children: (
+                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 sm:gap-6 w-full">
+                      <DoctorCallPanel />
+                      {/* <MyQueuePanel /> */}
+                    </div>
+                  ),
+                },
+              ]}
 
-          {/* Existing patient form */}
-          <div
-            className="anim-fadeUp w-full max-w-2xl h-max bg-white/97 rounded-3xl overflow-hidden border border-indigo-200/70"
-            style={{
-              boxShadow:
-                "0 12px 48px rgba(79,70,229,0.13), 0 2px 8px rgba(0,0,0,0.04)",
-            }}
-          >
-            <FormHeader selectedPatient={selectedPatient} />
-            <FormBody
-              username={loginUserData?.username}
-              selectedPatient={selectedPatient}
-              setSelectedPatient={setSelectedPatient}
             />
           </div>
-
-          {/* Call panels: mobile par 1 column, lg par 2 columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 w-full max-w-5xl">
-            <DoctorCallPanel />
-            <MyQueuePanel />
-          </div>
-
-
         </main>
 
         {/* FOOTER */}
@@ -312,7 +330,6 @@ const MedicalAssistant = () => {
           </div>
         </div>
       </Modal>
-
     </>
   );
 };

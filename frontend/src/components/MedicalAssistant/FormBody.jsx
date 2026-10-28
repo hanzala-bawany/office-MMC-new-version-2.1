@@ -585,7 +585,7 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
         </div>
 
         {/* Vitals station: weight + height in one go */}
-        {station.weight && station.height && (
+        {/* {station.weight && station.height && (
           <button
             type="button"
             onClick={() => setStationMode("combined")}
@@ -597,7 +597,7 @@ const FormBody = ({ selectedPatient, setSelectedPatient, username }) => {
           >
             ⚡ Capture Weight + Height
           </button>
-        )}
+        )} */}
 
         {/* Vitals Grid */}
         <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-3.5 mb-6">

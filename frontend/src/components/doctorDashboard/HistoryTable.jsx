@@ -20,26 +20,22 @@ import UrineReport from "../PatientHistory/UrineReport";
 import KidneyFunction from "../PatientHistory/KidneyFunction";
 import { formatHeight } from "../../utills/formatHeight";
 
-
 const { Title, Text } = Typography;
 
-
-
 const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
-
+  
   const [openReport, setOpenReport] = useState(null);
   const [openVitals, setOpenVitals] = useState(false);
   const [openTreatment, setOpenTreatment] = useState(false);
-  const card = "rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 themeBoxShadow";
+  const card =
+    "rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 themeBoxShadow";
   const [openPatientDetail, setOpenPatientDetail] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState(null);
   const [activeReportTab, setActiveReportTab] = useState("cbc");
 
-
-  console.log(currentPatientHistory, "currentPatientHistory ,,,,,,,,,,,");
-  // console.log(selectedHistory, "selectedHistory ,,,,,,,,,,,");
+  // console.log(currentPatientHistory, "currentPatientHistory ,,,,,,,,,,,");
+  console.log(selectedHistory, "selectedHistory ,,,,,,,,,,,");
   // console.log(lastVisit, "lastVisit ,,,,,,,,,,,");
-
 
   const openDetailModal = (record) => {
     setSelectedHistory(record);
@@ -56,7 +52,6 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
     setOpenReport(true);
     setActiveReportTab("cbc");
   };
-
 
   const historyColumns = [
     { title: "Date", dataIndex: "VISIT_DATE" },
@@ -109,80 +104,13 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
 
   // console.log(selectedHistory, "selectedHistory?.MEDICAL_TESTS");
 
-  // const isCBC = selectedHistory?.MEDICAL_TESTS?.toLowerCase().includes("cbc") 
+  // const isCBC = selectedHistory?.MEDICAL_TESTS?.toLowerCase().includes("cbc")
   // const isUrine = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("urine");
   // const iskidneyFunction = selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidneyfunction") || selectedHistory?.MEDICAL_TESTS?.toLowerCase()?.includes("kidney function");
-
-  // const getReportTabs = () => {
-
-  //   const tabs = [];
-
-  //   if (isCBC) {
-  //     tabs.push({
-  //       key: "cbc",
-  //       label: (
-  //         <span className="flex items-center gap-2">
-  //           <FaFlask className="text-blue-500" />
-  //           CBC Report
-  //         </span>
-  //       ),
-  //       children: <CBCReport patientData={selectedHistory} />,
-  //     });
-  //   }
-
-  //   if (isUrine) {
-  //     tabs.push({
-  //       key: "urine",
-  //       label: (
-  //         <span className="flex items-center gap-2">
-  //           <FaNotesMedical className="text-green-500" />
-  //           Urine Report
-  //         </span>
-  //       ),
-  //       children: <UrineReport patientData={selectedHistory} />,
-  //     });
-  //   }
-
-  //   if (iskidneyFunction) {
-  //     tabs.push({
-  //       key: "kidneyFunction",
-  //       label: (
-  //         <span className="flex items-center gap-2">
-  //           <FaNotesMedical className="text-green-500" />
-  //           kidney Function Report
-  //         </span>
-  //       ),
-  //       children: <KidneyFunction patientData={selectedHistory} />,
-  //     });
-  //   }
-
-  //   // If no specific tests found, show a message
-  //   if (tabs.length === 0) {
-  //     tabs.push({
-  //       key: "no-report",
-  //       label: (
-  //         <span className="flex items-center gap-2">
-  //           <FaMicroscope className="text-gray-500" />
-  //           No Reports
-  //         </span>
-  //       ),
-  //       children: (
-  //         <div className="p-8 text-center">
-  //           <FaMicroscope className="text-4xl text-gray-300 mx-auto mb-3" />
-  //           <p className="text-gray-500 font-medium">No lab reports available for this visit</p>
-  //           <p className="text-gray-400 text-sm mt-1">Medical tests: {selectedHistory?.MEDICAL_TESTS || 'Not specified'}</p>
-  //         </div>
-  //       ),
-  //     });
-  //   }
-
-  //   return tabs;
-  // };
 
 
   return (
     <>
-
       {/* ===================== Patient vitals Modal ===================== */}
 
       <Modal
@@ -192,7 +120,6 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
         centered
         width={600}
       >
-
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
@@ -207,7 +134,6 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
 
         {/* Body */}
         <div className="mt-3 grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm p-4 rounded-2xl themeBoxShadow">
-
           {/* Blood Pressure */}
           <div className="flex flex-col p-3 rounded-lg border bg-pink-50 border-pink-500">
             <span className="text-black font-semibold flex items-center gap-1">
@@ -268,8 +194,15 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
             </span>
           </div>
 
+          <div className="flex flex-col p-3 rounded-lg border bg-cyan-50 border-cyan-600">
+            <span className="text-black font-semibold flex items-center gap-1">
+              SpO₂
+            </span>
+            <span className="font-bold text-cyan-700">
+              {selectedHistory?.SPO2 ? `${selectedHistory.SPO2} %` : "N/A"}
+            </span>
+          </div>
         </div>
-
 
       </Modal>
 
@@ -283,7 +216,6 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
         width={850}
       >
         <div className="flex justify-between items-center mb-4">
-
           <h2 className="text-lg font-bold text-gray-700 flex items-center gap-2">
             <FaFileMedical className="text-blue-600" />
             Patient Details
@@ -292,7 +224,6 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
           <div className="text-sm text-gray-600 mr-6">
             {selectedHistory?.PATIENTNAME}
           </div>
-
         </div>
 
         {/* tabs section */}
@@ -305,7 +236,9 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
               label: "Diagnosis",
               children: (
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  {selectedHistory?.PRIMARY_DIAGNOSIS?.split(",").join(" -- ") || "No Data"}
+                  {selectedHistory?.PRIMARY_DIAGNOSIS?.split(",").join(
+                    " -- ",
+                  ) || "No Data"}
                 </div>
               ),
             },
@@ -315,7 +248,8 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
               label: "Medical Tests",
               children: (
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  {selectedHistory?.MEDICAL_TESTS?.split(",").join("  ,  ") || "No Data"}
+                  {selectedHistory?.MEDICAL_TESTS?.split(",").join("  ,  ") ||
+                    "No Data"}
                 </div>
               ),
             },
@@ -364,8 +298,11 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
             marginBottom: 0,
           }}
           renderTabBar={(props, DefaultTabBar) => (
-            <div style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-              <DefaultTabBar {...props} style={{ flexWrap: 'nowrap', minWidth: 'max-content' }} />
+            <div style={{ overflowX: "auto", whiteSpace: "nowrap" }}>
+              <DefaultTabBar
+                {...props}
+                style={{ flexWrap: "nowrap", minWidth: "max-content" }}
+              />
             </div>
           )}
         />
@@ -421,14 +358,11 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
 
       <Card
         title={
-
           <div className="flex justify-between items-center w-full">
-
             <div className="flex items-center  text-md sm:text-lg gap-2 font-bold text-slate-700">
               <FaHistory className="text-blue-500" />
               Patient <span className="hidden sm:inline"> Visit </span> History
             </div>
-
 
             <div className="hidden md:flex items-center gap-3 bg-blue-50 px-3 py-1 rounded-full shadow-sm">
               <FaHeartbeat className="text-red-500 text-lg" />
@@ -437,9 +371,7 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
               </span>
             </div>
 
-
             <div className="flex items-center gap-4 text-xs sm:text-sm">
-
               <div className="flex flex-col sm:flex-row sm:gap-2  text-center">
                 <span className="text-black">Last Visit</span>
                 <span className="font-semibold text-blue-600">
@@ -455,10 +387,7 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
                   {currentPatientHistory?.length}
                 </span>
               </div>
-
             </div>
-
-
           </div>
         }
         className={`${card} flex-1`}
@@ -481,9 +410,8 @@ const HistoryTable = ({ currentPatientHistory, lastVisit }) => {
           rowKey={(record, i) => record?.RECEIPTNO || i}
         />
       </Card>
-
     </>
-  )
-}
+  );
+};
 
-export default HistoryTable
+export default HistoryTable;
