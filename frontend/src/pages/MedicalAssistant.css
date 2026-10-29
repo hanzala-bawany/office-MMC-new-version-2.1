@@ -1,0 +1,12 @@
+.medical-tabs .ant-tabs-nav::before {
+  border-bottom-color: rgba(99, 102, 241, 0.2);
+}
+.medical-tabs .ant-tabs-tab {
+  font-weight: 600;
+}
+.medical-tabs .ant-tabs-ink-bar {
+  background: #4f46e5;
+}
+.medical-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #4f46e5 !important;
+}

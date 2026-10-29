@@ -18,52 +18,17 @@ import FormBody from "../components/MedicalAssistant/FormBody";
 import hospitraxLogo from "../assets/productLogoBgRemove.png";
 import DoctorCallPanel from "../components/MedicalAssistant/DoctorCallPanel";
 import MyQueuePanel from "../components/MedicalAssistant/MyQueuePanel";
+import "./MedicalAssistant.css"
+
 
 const MedicalAssistant = () => {
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const loginUserData = JSON.parse(localStorage.getItem("loginUserData"));
 
-  // TODO: apne API/socket se replace karo
-  const [doctors, setDoctors] = useState([]);
-  const [doctorPatients, setDoctorPatients] = useState([]);
-  const [myQueue, setMyQueue] = useState([]);
-  const [myCurrent, setMyCurrent] = useState(null);
-
-  const doctorHandlers = {
-    onDoctorChange: (doctorId) => {
-      /* fetch waiting patients -> setDoctorPatients */
-    },
-    onCallNext: (doctorId) => {
-      /* API */
-    },
-    onCallSpecific: (doctorId, patientId) => {
-      /* API */
-    },
-    onRepeat: (doctorId) => {
-      /* API */
-    },
-    onSkip: (doctorId) => {
-      /* API */
-    },
-  };
-
-  const myQueueHandlers = {
-    onCallNext: () => {
-      /* API */
-    },
-    onCallSpecific: (patientId) => {
-      /* API */
-    },
-    onRepeat: () => {
-      /* API */
-    },
-    onSkip: () => {
-      /* API */
-    },
-  };
 
   const handleLogout = () => {
     dispatch(logoutUser());
